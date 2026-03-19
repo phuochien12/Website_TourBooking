@@ -8,17 +8,12 @@ const { layCauTraLoiAI } = require('./XuLyAI');
 
 
 
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// CẤU HÌNH GỬI EMAIL (Nodemailer)
-// Lưu ý: User cần điền EMAIL_USER và EMAIL_PASS (App Password của Gmail) vào file .env để gửi đc thật.
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER || 'your_email@gmail.com',
-        pass: process.env.EMAIL_PASS || 'your_app_password'
-    }
-});
+// CẤU HÌNH GỬI EMAIL (Resend.com)
+// Sử dụng RESEND_API_KEY trong file .env
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -309,10 +304,10 @@ app.post('/api/forgot-password', async (req, res) => {
             expires: Date.now() + 10 * 60 * 1000 // 10 phút
         });
 
-        // Gửi Email chứa mã OTP
-        const mailOptions = {
-            from: `"Hệ thống Du Lịch Việt" <${process.env.EMAIL_USER || 'noreply@dulichviet.com'}>`,
-            to: Email,
+        // Gửi Email chứa mã OTP qua Resend
+        const { data, error } = await resend.emails.send({
+            from: 'Du Lịch Việt <onboarding@resend.dev>',
+            to: [Email],
             subject: 'Mã xác thực (OTP) đặt lại mật khẩu - Du Lịch Việt',
             html: `
                 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); background-color: #ffffff;">
@@ -329,7 +324,7 @@ app.post('/api/forgot-password', async (req, res) => {
                         </div>
                         
                         <div style="background-color: #fff7ed; border-left: 4px solid #f97316; padding: 15px; margin-bottom: 30px;">
-                            <p style="color: #9a3412; font-size: 13px; margin: 0; font-weight: 600;">Lưu ý: Mã này có hiệu lực trong vòng 10 phút. Tuyệt đối không chia sẻ mã này cho bất kỳ ai.</p>
+                            <p style="color: #9a3412; font-size: 13px; margin: 0; font-weight: 600;">Lưu ý: Mã này có hiệu lực trong vòng 10 phút. Tuyệt đối không chia sẻ mã này cho bắt kỳ ai.</p>
                         </div>
                         
                         <p style="color: #64748b; font-size: 12px; text-align: center; margin-top: 40px; border-top: 1px solid #f1f5f9; padding-top: 25px;">
@@ -339,15 +334,18 @@ app.post('/api/forgot-password', async (req, res) => {
                     </div>
                 </div>
             `
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error("Lỗi gửi mail OTP:", error);
-                return res.status(500).json({ success: false, message: 'Lỗi khi gửi email xác thực.' });
-            }
-            res.json({ success: true, message: 'Mã OTP đã được gửi vào email của bạn!' });
         });
+
+        if (error) {
+            console.error("Lỗi gửi mail OTP qua Resend:", error);
+            return res.status(500).json({ success: false, message: 'Lỗi khi gửi email xác thực.' });
+        }
+        res.json({ success: true, message: 'Mã OTP đã được gửi vào email của bạn!' });
+
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -544,11 +542,11 @@ app.post('/api/dat-tour', async (req, res) => {
             .input('SoKhach', sql.Int, SoKhach)
             .query(`UPDATE LichKhoiHanh SET SoChoDaDat = SoChoDaDat + @SoKhach WHERE MaLich = @MaLich`);
 
-        // --- BƯỚC 4: GỬI EMAIL XÁC NHẬN ---
+        // --- BƯỚC 4: GỬI EMAIL XÁC NHẬN QUA RESEND ---
         try {
-            const mailOptions = {
-                from: process.env.EMAIL_USER || '"Công Ty Du Lịch Việt" <tourbooking.dummy@gmail.com>',
-                to: Email, // Gửi đến email của khách hàng vừa nhập
+            await resend.emails.send({
+                from: 'Du Lịch Việt <onboarding@resend.dev>',
+                to: [Email], // Gửi đến email của khách hàng
                 subject: 'Xác nhận Đặt Tour Thành Công - Du Lịch Việt',
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
@@ -600,7 +598,6 @@ app.post('/api/dat-tour', async (req, res) => {
                         </div>
                         `}
 
-
                         <p style="margin-top: 20px;">Vui lòng kiểm tra lại thông tin. Nếu có bất kỳ sai sót nào, quý khách vui lòng liên hệ ngay hotline <b>0354858892</b> để được hỗ trợ.</p>
                         <p style="margin-top: 20px; text-align: center; color: #6b7280; font-size: 12px;">
                             Đây là email tự động, vui lòng không trả lời email này.<br/>
@@ -608,52 +605,41 @@ app.post('/api/dat-tour', async (req, res) => {
                         </p>
                     </div>
                 `
-            };
-
-            // Gọi hàm gửi mail (chạy ngầm không block luồng)
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.log("⚠️ Gửi email thất bại (Vui lòng cấu hình EMAIL_USER và EMAIL_PASS trong .env):", error.message);
-                } else {
-                    console.log("✅ Đã gửi email xác nhận thành công đến:", Email);
-                }
             });
+            console.log("✅ Đã gửi email xác nhận đặt tour qua Resend đến:", Email);
+        } catch (mailError) {
+            console.log("⚠️ Lỗi gửi email qua Resend:", mailError.message);
+        }
 
         } catch (mailError) {
             console.log("⚠️ Lỗi logic khi chuẩn bị email:", mailError);
         }
 
-        // --- BƯỚC 5: GỬI EMAIL THÔNG BÁO CHO ADMIN ---
+        // --- BƯỚC 5: GỬI EMAIL THÔNG BÁO CHO ADMIN QUA RESEND ---
         try {
-            const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
-            if (adminEmail) {
-                const mailToAdmin = {
-                    from: process.env.EMAIL_USER || '"Du Lịch Việt" <noreply@dulichviet.com>',
-                    to: adminEmail,
-                    subject: `[ĐƠN MỚI] Khách ${HoTen} vừa đặt tour - ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ`,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
-                            <h2 style="color: #dc2626; text-align: center;">🔔 CÓ ĐƠN ĐẶT TOUR MỚI!</h2>
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                                <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Khách hàng:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${HoTen}</td></tr>
-                                <tr><td style="padding: 10px; border: 1px solid #ddd;"><b>Email:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${Email}</td></tr>
-                                <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Số ĐT:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${SoDienThoai}</td></tr>
-                                <tr><td style="padding: 10px; border: 1px solid #ddd;"><b>Số khách:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${SoKhach} người</td></tr>
-                                <tr style="background-color: #fef2f2;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Tổng tiền:</b></td><td style="padding: 10px; border: 1px solid #ddd; color: #dc2626; font-weight: bold; font-size: 18px;">${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ</td></tr>
-                                <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Thanh toán:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${PhuongThucThanhToan === 'chuyen_khoan' ? 'Chuyển khoản' : PhuongThucThanhToan === 'momo' ? 'Ví MoMo' : 'Tiền mặt'}</td></tr>
-                            </table>
-                            <p style="margin-top: 15px; text-align: center;"><a href="http://localhost:3000/admin/don-hang" style="background-color: #2563eb; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">Vào Quản Trị Xem Đơn</a></p>
-                            <p style="margin-top: 15px; color: #6b7280; font-size: 12px; text-align: center;">Email tự động từ hệ thống Du Lịch Việt.</p>
-                        </div>
-                    `
-                };
-                transporter.sendMail(mailToAdmin, (err, info) => {
-                    if (err) console.log('⚠️ Gửi mail đơn mới cho Admin thất bại:', err.message);
-                    else console.log('✅ Đã gửi mail thông báo đơn mới cho Admin');
-                });
-            }
+            const adminEmail = process.env.ADMIN_EMAIL || 'phuochien847@gmail.com'; 
+            await resend.emails.send({
+                from: 'Hệ Thống <onboarding@resend.dev>',
+                to: [adminEmail],
+                subject: `[ĐƠN MỚI] Khách ${HoTen} vừa đặt tour - ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                        <h2 style="color: #dc2626; text-align: center;">🔔 CÓ ĐƠN ĐẶT TOUR MỚI!</h2>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                            <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Khách hàng:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${HoTen}</td></tr>
+                            <tr><td style="padding: 10px; border: 1px solid #ddd;"><b>Email:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${Email}</td></tr>
+                            <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Số ĐT:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${SoDienThoai}</td></tr>
+                            <tr><td style="padding: 10px; border: 1px solid #ddd;"><b>Số khách:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${SoKhach} người</td></tr>
+                            <tr style="background-color: #fef2f2;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Tổng tiền:</b></td><td style="padding: 10px; border: 1px solid #ddd; color: #dc2626; font-weight: bold; font-size: 18px;">${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ</td></tr>
+                            <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Thanh toán:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${PhuongThucThanhToan === 'chuyen_khoan' ? 'Chuyển khoản' : 'Tiền mặt'}</td></tr>
+                        </table>
+                        <p style="margin-top: 15px; text-align: center;"><a href="https://website-tour-booking.vercel.app/admin/don-hang" style="background-color: #2563eb; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">Vào Quản Trị Xem Đơn</a></p>
+                    </div>
+                `
+            });
+            console.log('✅ Đã gửi mail thông báo cho Admin qua Resend');
         } catch (adminMailErr) {
-            console.log('⚠️ Lỗi gửi mail admin:', adminMailErr.message);
+            console.log('⚠️ Lỗi gửi mail admin qua Resend:', adminMailErr.message);
         }
 
         // Trả về kết quả thành công cho Frontend
