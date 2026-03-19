@@ -180,8 +180,8 @@ function DanhSachTour() {
                                                         <span className="uppercase text-[11px] font-semibold tracking-wide text-gray-400">Từ: {tour.DiemKhoiHanh || 'Cần Thơ'}</span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className={tour.SoLich > 0 ? 'text-primary' : 'text-orange-500'}>📅</span>
-                                                        <span className={`text-[11px] font-bold ${tour.SoLich > 0 ? 'text-gray-500' : 'text-orange-500 italic'}`}>
+                                                        <span className={tour.SoLich > 0 ? 'text-primary' : 'text-red-500'}>📅</span>
+                                                        <span className={`text-[11px] font-bold ${tour.SoLich > 0 ? 'text-gray-500' : 'text-red-600 italic'}`}>
                                                             {tour.SoLich > 0 ? 'Lịch: Hàng tuần' : 'Đang cập nhật lịch'}
                                                         </span>
                                                     </div>
