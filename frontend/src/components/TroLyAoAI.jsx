@@ -11,6 +11,98 @@ const TroLyAoAI = () => {
     const [loading, setLoading] = useState(false);
     const endOfMessagesRef = useRef(null);
 
+    // --- LOGIC KÉO THẢ (DRAG & DROP) ---
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStart = useRef({ x: 0, y: 0 });
+    const originalPos = useRef({ x: 0, y: 0 });
+    const hasMoved = useRef(false);
+
+    const onMouseDown = (e) => {
+        if (isOpen) return; // Không cho kéo khi đang mở cửa sổ chat
+        setIsDragging(true);
+        hasMoved.current = false;
+        dragStart.current = { x: e.clientX, y: e.clientY };
+        originalPos.current = { x: position.x, y: position.y };
+    };
+
+    const onMouseMove = (e) => {
+        if (!isDragging) return;
+        
+        const deltaX = e.clientX - dragStart.current.x;
+        const deltaY = e.clientY - dragStart.current.y;
+        
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+            hasMoved.current = true;
+        }
+
+        setPosition({
+            x: originalPos.current.x + deltaX,
+            y: originalPos.current.y + deltaY
+        });
+    };
+
+    const onMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    const onTouchStart = (e) => {
+        if (isOpen) return;
+        setIsDragging(true);
+        hasMoved.current = false;
+        const touch = e.touches[0];
+        dragStart.current = { x: touch.clientX, y: touch.clientY };
+        originalPos.current = { x: position.x, y: position.y };
+    };
+
+    const onTouchMove = (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - dragStart.current.x;
+        const deltaY = touch.clientY - dragStart.current.y;
+        
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+            hasMoved.current = true;
+        }
+
+        setPosition({
+            x: originalPos.current.x + deltaX,
+            y: originalPos.current.y + deltaY
+        });
+    };
+
+    const onTouchEnd = () => {
+        setIsDragging(false);
+    };
+
+    // Lắng nghe sự kiện toàn cục để kéo mượt hơn
+    useEffect(() => {
+        if (isDragging) {
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+            window.addEventListener('touchmove', onTouchMove, { passive: false });
+            window.addEventListener('touchend', onTouchEnd);
+        } else {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('touchend', onTouchEnd);
+        }
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('touchend', onTouchEnd);
+        };
+    }, [isDragging]);
+
+    const toggleOpen = () => {
+        if (!hasMoved.current) {
+            setIsOpen(!isOpen);
+        }
+    };
+    // -----------------------------------
+
     const scrollToBottom = () => {
         endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -19,7 +111,6 @@ const TroLyAoAI = () => {
         scrollToBottom();
     }, [chatHistory]);
 
-    // Các câu hỏi nhanh (Hybrid logic)
     const quickQuestions = [
         "Địa chỉ công ty",
         "Hotline hỗ trợ",
@@ -31,7 +122,6 @@ const TroLyAoAI = () => {
         const textToSend = customMessage || message;
         if (!textToSend.trim() || loading) return;
 
-        // Lưu câu hỏi của khách vào giao diện ngay lập tức
         const userMsg = { role: 'user', text: textToSend };
         setChatHistory(prev => [...prev, userMsg]);
         setMessage('');
@@ -42,24 +132,34 @@ const TroLyAoAI = () => {
             const botAnswer = res.data.answer || "Dạ, mình chưa rõ ý bạn lắm.";
             setChatHistory(prev => [...prev, { role: 'bot', text: botAnswer }]);
         } catch (error) {
-            setChatHistory(prev => [...prev, { role: 'bot', text: "Hệ thống đang bận một chút, bạn thử lại sau hoặc gọi hotline nhé! ❤️" }]);
+            setChatHistory(prev => [...prev, { role: 'bot', text: "Hệ đóng đang bận một chút, bạn thử lại sau hoặc gọi hotline nhé! ❤️" }]);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
+        <div 
+            className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end"
+            style={{
+                transform: `translate(${position.x}px, ${position.y}px)`,
+                transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+                cursor: isDragging ? 'grabbing' : 'auto'
+            }}
+        >
             {/* Nút bong bóng chat */}
             {!isOpen && (
                 <button
-                    onClick={() => setIsOpen(true)}
-                    className="w-16 h-16 bg-gradient-to-br from-navy to-primary text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 animate-bounce cursor-pointer relative group"
+                    onMouseDown={onMouseDown}
+                    onTouchStart={onTouchStart}
+                    onClick={toggleOpen}
+                    className="w-16 h-16 bg-gradient-to-br from-navy to-primary text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 animate-bounce cursor-grab active:cursor-grabbing relative group select-none"
+                    style={{ touchAction: 'none' }}
                 >
                     <FaRobot size={28} />
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center animate-pulse">1</span>
-                    <div className="absolute right-20 bg-white text-navy px-4 py-2 rounded-xl border shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all">
-                        Cần trợ lý tư vấn tour?
+                    <div className="absolute right-20 bg-white text-navy px-4 py-2 rounded-xl border shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all pointer-events-none">
+                        Cầm tôi kéo đi đâu cũng được! 🚀
                     </div>
                 </button>
             )}
@@ -68,7 +168,7 @@ const TroLyAoAI = () => {
             {isOpen && (
                 <div className="bg-white w-[380px] h-[580px] rounded-[30px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden border border-gray-100 animate-in fade-in slide-in-from-bottom-10 duration-500">
                     {/* Header */}
-                    <div className="bg-[#1e3a5f] p-5 text-white flex justify-between items-center shadow-lg relative">
+                    <div className="bg-[#1e3a5f] p-5 text-white flex justify-between items-center shadow-lg relative cursor-default">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/30">
                                 <FaRobot size={24} className="text-white" />
