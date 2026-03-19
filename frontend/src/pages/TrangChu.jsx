@@ -100,15 +100,22 @@ function TrangChu() {
                 e.preventDefault();
                 Swal.fire({
                     title: 'Đang cập nhật lịch mới!',
-                    text: 'Tour này hiện chưa có ngày khởi hành chính thức. Bạn có muốn nhận tư vấn riêng qua Zalo không?',
+                    text: 'Tour này hiện chưa có ngày khởi hành chính thức. Bạn muốn xem tiếp thông tin chương trình tour hay cần hỗ trợ tư vấn ngay?',
                     icon: 'info',
                     showCancelButton: true,
-                    confirmButtonColor: '#2563eb',
+                    showDenyButton: true,
+                    confirmButtonColor: '#3085d6',
+                    denyButtonColor: '#10b981',
                     cancelButtonColor: '#6b7280',
-                    confirmButtonText: '💬 Nhắn Zalo ngay',
-                    cancelButtonText: 'Để tôi xem tour khác'
+                    confirmButtonText: '📖 Xem chi tiết tour',
+                    denyButtonText: '💬 Tư vấn Zalo',
+                    cancelButtonText: 'Để sau'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Nếu chọn xem tiếp thì điều hướng
+                        navigate(`/tour/${tour.MaTour}`);
+                    } else if (result.isDenied) {
+                        // Nếu chọn Zalo
                         window.open('https://zalo.me/0354858892', '_blank');
                     }
                 });

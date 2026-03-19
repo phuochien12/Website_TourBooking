@@ -106,15 +106,20 @@ function DanhSachTour() {
                                             e.preventDefault();
                                             Swal.fire({
                                                 title: 'Tour đang được cập nhật!',
-                                                text: 'Ngày khởi hành mới cho tour này sắp được công bố. Bạn có muốn nhận thông báo hoặc tư vấn qua Zalo không?',
+                                                text: 'Ngày khởi hành mới cho tour này sắp được công bố. Bạn muốn xem tiếp thông tin chương trình tour hay cần hỗ trợ tư vấn ngay?',
                                                 icon: 'info',
                                                 showCancelButton: true,
-                                                confirmButtonColor: '#2563eb',
+                                                showDenyButton: true,
+                                                confirmButtonColor: '#3085d6',
+                                                denyButtonColor: '#10b981',
                                                 cancelButtonColor: '#6b7280',
-                                                confirmButtonText: '💬 Tư vấn Zalo',
+                                                confirmButtonText: '📖 Xem chi tiết tour',
+                                                denyButtonText: '💬 Tư vấn Zalo',
                                                 cancelButtonText: 'Để sau'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
+                                                    navigate(`/tour/${tour.MaTour}`);
+                                                } else if (result.isDenied) {
                                                     window.open('https://zalo.me/0354858892', '_blank');
                                                 }
                                             });
