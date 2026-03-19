@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 function DanhSachTour() {
     const [tours, setTours] = useState([]);
@@ -98,10 +99,32 @@ function DanhSachTour() {
                                 {tours.map(tour => {
                                     const hasDiscount = tour.PhanTramGiamGia && tour.PhanTramGiamGia > 0;
                                     const salePrice = hasDiscount ? tour.GiaGoc * (1 - tour.PhanTramGiamGia / 100) : tour.GiaGoc;
+
+                                    // Hàm xử lý khi click vào Tour
+                                    const handleTourClick = (e) => {
+                                        if (tour.SoLich === 0) {
+                                            e.preventDefault();
+                                            Swal.fire({
+                                                title: 'Tour đang được cập nhật!',
+                                                text: 'Ngày khởi hành mới cho tour này sắp được công bố. Bạn có muốn nhận thông báo hoặc tư vấn qua Zalo không?',
+                                                icon: 'info',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#2563eb',
+                                                cancelButtonColor: '#6b7280',
+                                                confirmButtonText: '💬 Tư vấn Zalo',
+                                                cancelButtonText: 'Để sau'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.open('https://zalo.me/0354858892', '_blank');
+                                                }
+                                            });
+                                        }
+                                    };
+
                                     return (
                                         <div key={tour.MaTour} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover-card-effect group flex flex-col h-full">
                                             {/* Ảnh Tour */}
-                                            <Link to={`/tour/${tour.MaTour}`} className="h-56 relative block overflow-hidden">
+                                            <Link to={`/tour/${tour.MaTour}`} onClick={handleTourClick} className="h-56 relative block overflow-hidden">
                                                 {tour.AnhBia ? (
                                                     <img src={tour.AnhBia} alt={tour.TenTour} className="w-full h-full object-cover hover-zoom-img" />
                                                 ) : (
@@ -149,7 +172,7 @@ function DanhSachTour() {
                                             {/* Chi tiết Tour */}
                                             <div className="p-5 flex flex-col flex-grow">
                                                 <h3 className="text-base font-bold mb-3 text-navy group-hover:text-primary transition-colors line-clamp-2 min-h-[48px]">
-                                                    <Link to={`/tour/${tour.MaTour}`}>{tour.TenTour}</Link>
+                                                    <Link to={`/tour/${tour.MaTour}`} onClick={handleTourClick}>{tour.TenTour}</Link>
                                                 </h3>
                                                 <div className="space-y-2 mb-6 text-sm text-gray-500">
                                                     <div className="flex items-center gap-2">
@@ -174,7 +197,7 @@ function DanhSachTour() {
                                                             {new Intl.NumberFormat('vi-VN').format(salePrice)}<small className="text-xs font-medium ml-0.5 whitespace-nowrap">đ / khách</small>
                                                         </span>
                                                     </div>
-                                                    <Link to={`/tour/${tour.MaTour}`} className="bg-primary/5 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-xl font-bold text-xs transition-all flex-shrink-0">
+                                                    <Link to={`/tour/${tour.MaTour}`} onClick={handleTourClick} className="bg-primary/5 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-xl font-bold text-xs transition-all flex-shrink-0">
                                                         Chi tiết
                                                     </Link>
                                                 </div>
