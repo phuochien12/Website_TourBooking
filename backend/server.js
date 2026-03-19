@@ -709,9 +709,10 @@ app.put('/api/bookings/huy-don/:id', async (req, res) => {
 
         const don = donHang.recordset[0];
 
-        // Chỉ cho phép hủy nếu trạng thái vẫn là 'Chờ xử lý'
-        if (don.TrangThai !== 'Chờ xử lý') {
-            return res.status(400).json({ message: 'Đơn này đã được xử lý, vui lòng liên hệ hotline 0354858892 để hủy!' });
+        // Chỉ cho phép hủy nếu trạng thái vẫn là 'Chờ xử lý' hoặc 'Chờ thanh toán'
+        const allowCancelStatuses = ['Chờ xử lý', 'Chờ thanh toán'];
+        if (!allowCancelStatuses.includes(don.TrangThai)) {
+            return res.status(400).json({ message: 'Đơn này đã được xử lý hoặc đã hoàn tất, vui lòng liên hệ hotline 0354858892 để được hỗ trợ hủy!' });
         }
 
         // ===== BƯỚC 2: CẬP NHẬT TRẠNG THÁI THÀNH 'HỦY' =====
