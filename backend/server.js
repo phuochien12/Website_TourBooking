@@ -4,6 +4,14 @@ const { connectDB, sql } = require('./db');
 const multer = require('multer');
 const path = require('path');
 require('dotenv').config();
+const cloudinary = require('cloudinary').v2;
+
+// Cấu hình Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 const { layCauTraLoiAI } = require('./XuLyAI'); 
 
 
@@ -27,29 +35,31 @@ const axios = require('axios');
 app.use(cors()); // Cho phép Frontend gọi API
 app.use(express.json()); // Đọc dữ liệu JSON từ request
 
-// Cấu hình Multer lưu ảnh vào Frontend
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        // Lưu thẳng vào thư mục images của frontend
-        cb(null, path.join(__dirname, '../frontend/public/images'));
-    },
-    filename: (req, file, cb) => {
-        // Tạo tên file an toàn: tour-[timestamp].jpg
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, 'tour-' + uniqueSuffix + ext);
-    }
-});
+// Cấu hình Multer lưu vào bộ nhớ tạm (Buffer) để đẩy lên Cloudinary
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// API Upload ảnh
+// API Upload ảnh lên Cloudinary
 app.post('/api/upload-image', upload.single('image'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'Chưa chèn ảnh!' });
     }
-    // Trả về đường link URL tĩnh để Frontend lưu vào CSDL
-    const fileUrl = `/images/${req.file.filename}`;
-    res.json({ success: true, url: fileUrl });
+
+    // Đẩy stream ảnh lên Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: 'tour_website' }, // Tự tạo thư mục tên tour_website trên cloud cho gọn
+        (error, result) => {
+            if (error) {
+                console.error("Lỗi upload Cloudinary:", error);
+                return res.status(500).json({ success: false, message: 'Lỗi tải ảnh lên Cloudinary' });
+            }
+            // Trả về đường link URL từ Cloudinary
+            res.json({ success: true, url: result.secure_url });
+        }
+    );
+
+    // Ghi dữ liệu ảnh từ Buffer vào luồng tải lên
+    uploadStream.end(req.file.buffer);
 });
 
 // Route kiểm tra server hoạt động
