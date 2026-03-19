@@ -36,20 +36,15 @@ const ContactSpeedDial = () => {
     ];
 
     return (
-        <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-4">
+        <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start gap-4">
             {/* Speed Dial Actions */}
-            <div className={`flex flex-col items-end gap-3 transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+            <div className={`flex flex-col items-start gap-3 transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
                 {actions.map((action, index) => (
                     <div 
                         key={index} 
                         className="flex items-center gap-3 group"
                         style={{ transitionDelay: `${index * 50}ms` }}
                     >
-                        {/* Label */}
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-md text-navy px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-gray-100 whitespace-nowrap">
-                            {action.name}
-                        </span>
-                        
                         {/* Action Button */}
                         <a
                             href={action.link}
@@ -59,6 +54,11 @@ const ContactSpeedDial = () => {
                         >
                             {action.icon}
                         </a>
+
+                        {/* Label */}
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-md text-navy px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-gray-100 whitespace-nowrap">
+                            {action.name}
+                        </span>
                     </div>
                 ))}
             </div>
