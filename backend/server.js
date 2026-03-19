@@ -89,7 +89,12 @@ app.get('/api/categories', async (req, res) => {
 app.get('/api/tours', async (req, res) => {
     try {
         const { diemDi, diemDen, mucGia, thoiGian } = req.query;
-        let queryStr = 'SELECT * FROM Tour WHERE TrangThai = 1'; // Chỉ lấy tour đang mở (TrangThai = 1)
+        let queryStr = `
+            SELECT t.*, 
+                   (SELECT COUNT(*) FROM LichKhoiHanh l 
+                    WHERE l.MaTour = t.MaTour AND l.NgayKhoiHanh >= CAST(GETDATE() AS DATE)) as SoLich
+            FROM Tour t 
+            WHERE t.TrangThai = 1`;
 
         // Xây dựng câu truy vấn động dựa trên tham số truyền vào từ Front-End
         if (diemDi) queryStr += " AND DiemKhoiHanh LIKE N'%' + @diemDi + '%'";

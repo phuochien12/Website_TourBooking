@@ -160,7 +160,9 @@ function TrangChu() {
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="text-primary opacity-70">📅</span>
-                            <span>Khởi hành: <span className="text-gray-700 font-medium">Hàng tuần</span></span>
+                            <span>Khởi hành: <span className={`${tour.SoLich > 0 ? 'text-gray-700' : 'text-orange-500'} font-medium`}>
+                                {tour.SoLich > 0 ? (tour.DiemKhoiHanh ? 'Hàng tuần' : 'Liên hệ') : 'Đang cập nhật'}
+                            </span></span>
                         </div>
                     </div>
 

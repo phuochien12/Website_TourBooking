@@ -53,14 +53,16 @@ function LichKhoiHanhKhachHang() {
                                             <Link to={`/tour/${tour.MaTour}`} className="text-navy group-hover:text-primary transition-colors block">
                                                 {tour.TenTour}
                                                 <div className="text-[10px] text-gray-400 font-medium lowercase tracking-normal mt-1 flex items-center gap-2">
-                                                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                                    Đang mở bán trực tuyến
+                                                    <span className={`w-2 h-2 rounded-full ${tour.SoLich > 0 ? 'bg-green-500 animate-pulse' : 'bg-orange-400'}`}></span>
+                                                    {tour.SoLich > 0 ? 'Đang mở bán trực tuyến' : 'Đang cập nhật lịch mới'}
                                                 </div>
                                             </Link>
                                         </td>
                                         <td className="px-6 py-5 text-center text-gray-500">{tour.ThoiGian || 'Chưa cập nhật'}</td>
                                         <td className="px-6 py-5 text-center">
-                                            <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full text-[10px]">Hằng ngày</span>
+                                            <span className={`px-3 py-1 rounded-full text-[10px] ${tour.SoLich > 0 ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                                                {tour.SoLich > 0 ? 'Hằng ngày' : 'Sắp diễn ra'}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-5 text-center text-[11px] text-gray-400 font-black">★★★☆☆</td>
                                         <td className="px-6 py-5 text-right pr-10">
@@ -68,7 +70,11 @@ function LichKhoiHanhKhachHang() {
                                                 <span className="text-red-600 text-lg font-black tracking-tighter">
                                                     {new Intl.NumberFormat('vi-VN').format(tour.GiaGoc)}đ
                                                 </span>
-                                                <Link to={`/dat-tour/${tour.MaTour}`} className="text-[10px] text-primary hover:underline mt-1 bg-primary/10 px-2 py-0.5 rounded">Đặt chỗ ngay</Link>
+                                                {tour.SoLich > 0 ? (
+                                                    <Link to={`/dat-tour/${tour.MaTour}`} className="text-[10px] text-primary hover:underline mt-1 bg-primary/10 px-2 py-0.5 rounded">Đặt chỗ ngay</Link>
+                                                ) : (
+                                                    <Link to="/lien-he" className="text-[10px] text-gray-500 hover:underline mt-1 bg-gray-100 px-2 py-0.5 rounded italic">Liên hệ tư vấn</Link>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
