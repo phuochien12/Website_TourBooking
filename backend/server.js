@@ -6,12 +6,21 @@ const path = require('path');
 require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
 
-// Cấu hình Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Cấu hình Cloudinary (Có cơ chế kiểm tra lỗi tránh sập server)
+try {
+    if (process.env.CLOUDINARY_CLOUD_NAME) {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        });
+        console.log("Cấu hình Cloudinary thành công! ✅");
+    } else {
+        console.warn("⚠️ Cảnh báo: Chưa cấu hình Cloudinary trong biến môi trường!");
+    }
+} catch (err) {
+    console.error("Lỗi cấu hình Cloudinary:", err.message);
+}
 const { layCauTraLoiAI } = require('./XuLyAI'); 
 
 
