@@ -306,7 +306,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
         // Gửi Email chứa mã OTP qua Resend
         const { data, error } = await resend.emails.send({
-            from: 'Du Lịch Việt <onboarding@resend.dev>',
+            from: 'Du Lịch Việt <hotro@dulichviet.click>',
             to: [Email],
             subject: 'Mã xác thực (OTP) đặt lại mật khẩu - Du Lịch Việt',
             html: `
@@ -540,7 +540,7 @@ app.post('/api/dat-tour', async (req, res) => {
         // --- BƯỚC 4: GỬI EMAIL XÁC NHẬN QUA RESEND ---
         try {
             await resend.emails.send({
-                from: 'Du Lịch Việt <onboarding@resend.dev>',
+                from: 'Du Lịch Việt <hotro@dulichviet.click>',
                 to: [Email], // Gửi đến email của khách hàng
                 subject: 'Xác nhận Đặt Tour Thành Công - Du Lịch Việt',
                 html: `
@@ -610,7 +610,7 @@ app.post('/api/dat-tour', async (req, res) => {
         try {
             const adminEmail = process.env.ADMIN_EMAIL || 'phuochien847@gmail.com'; 
             await resend.emails.send({
-                from: 'Hệ Thống <onboarding@resend.dev>',
+                from: 'Hệ Thống Tour <hotro@dulichviet.click>',
                 to: [adminEmail],
                 subject: `[ĐƠN MỚI] Khách ${HoTen} vừa đặt tour - ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ`,
                 html: `
