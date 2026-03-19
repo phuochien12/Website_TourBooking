@@ -612,19 +612,39 @@ app.post('/api/dat-tour', async (req, res) => {
             await resend.emails.send({
                 from: 'Hệ Thống Tour <hotro@dulichviet.click>',
                 to: [adminEmail],
-                subject: `[ĐƠN MỚI] Khách ${HoTen} vừa đặt tour - ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ`,
+                reply_to: 'phuochien847@gmail.com', // Giúp Gmail tin tưởng hơn
+                subject: `Thông báo đơn đặt tour mới từ: ${HoTen} - Website Du Lịch Việt`,
                 html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
-                        <h2 style="color: #dc2626; text-align: center;">🔔 CÓ ĐƠN ĐẶT TOUR MỚI!</h2>
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                            <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Khách hàng:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${HoTen}</td></tr>
-                            <tr><td style="padding: 10px; border: 1px solid #ddd;"><b>Email:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${Email}</td></tr>
-                            <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Số ĐT:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${SoDienThoai}</td></tr>
-                            <tr><td style="padding: 10px; border: 1px solid #ddd;"><b>Số khách:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${SoKhach} người</td></tr>
-                            <tr style="background-color: #fef2f2;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Tổng tiền:</b></td><td style="padding: 10px; border: 1px solid #ddd; color: #dc2626; font-weight: bold; font-size: 18px;">${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ</td></tr>
-                            <tr style="background-color: #f3f4f6;"><td style="padding: 10px; border: 1px solid #ddd;"><b>Thanh toán:</b></td><td style="padding: 10px; border: 1px solid #ddd;">${PhuongThucThanhToan === 'chuyen_khoan' ? 'Chuyển khoản' : 'Tiền mặt'}</td></tr>
-                        </table>
-                        <p style="margin-top: 15px; text-align: center;"><a href="https://website-tour-booking.vercel.app/admin/don-hang" style="background-color: #2563eb; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">Vào Quản Trị Xem Đơn</a></p>
+                    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 25px; border-radius: 12px; color: #333;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <img src="https://website-tour-booking.vercel.app/logo.png" alt="Logo" style="width: 120px; margin-bottom: 10px;">
+                            <h2 style="color: #2c3e50; margin: 0;">THÔNG BÁO ĐƠN HÀNG MỚI</h2>
+                            <p style="color: #666; font-size: 14px;">Bạn có một yêu cầu đặt tour vừa được gửi từ Website.</p>
+                        </div>
+                        
+                        <div style="background-color: #f9fafb; padding: 20px; border-radius: 10px; border-left: 5px solid #1a5f2e;">
+                            <h3 style="color: #1a5f2e; margin-top: 0;">Thông tin khách hàng</h3>
+                            <p style="margin: 8px 0;"><strong>Họ và tên:</strong> ${HoTen}</p>
+                            <p style="margin: 8px 0;"><strong>Email:</strong> ${Email}</p>
+                            <p style="margin: 8px 0;"><strong>Điện thoại:</strong> ${SoDienThoai}</p>
+                            <p style="margin: 8px 0;"><strong>Số lượng:</strong> ${SoKhach} người</p>
+                        </div>
+
+                        <div style="margin-top: 20px; padding: 15px; background-color: #fffaf0; border: 1px dashed #d97706; border-radius: 10px;">
+                            <h3 style="color: #d97706; margin-top: 0;">Thông tin Tour & Thanh toán</h3>
+                            <p style="margin: 8px 0;"><strong>Mã đơn hàng:</strong> #${MaDon}</p>
+                            <p style="margin: 8px 0;"><strong>Phương thức:</strong> ${PhuongThucThanhToan === 'chuyen_khoan' ? 'Chuyển khoản ngân hàng' : 'Thanh toán tiền mặt'}</p>
+                            <p style="margin: 8px 0; font-size: 20px; color: #dc2626;"><strong>Tổng tiền: ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ</strong></p>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="https://website-tour-booking.vercel.app/admin/don-hang" style="background-color: #1a5f2e; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">VÀO TRANG QUẢN TRỊ XEM CHI TIẾT</a>
+                        </div>
+                        
+                        <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; font-size: 12px; color: #888; text-align: center;">
+                            <p>Đây là email thông báo tự động từ hệ thống Website Du Lịch Việt.</p>
+                            <p>© 2026 dulichviet.click . All rights reserved.</p>
+                        </div>
                     </div>
                 `
             });
