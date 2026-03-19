@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  @apply bg-[#faf9f7] text-gray-800 antialiased;
+}
+
+.font-heading {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Hiệu ứng rê chuột mượt mà cho Tour Card */
+.hover-card-effect {
+  @apply transition-all duration-500 ease-out;
+}
+.hover-card-effect:hover {
+  @apply -translate-y-2 shadow-2xl;
+}
+
+/* Hiệu ứng zoom ảnh khi hover */
+.hover-zoom-img {
+  @apply transition-transform duration-700 ease-out;
+}
+.group:hover .hover-zoom-img {
+  @apply scale-110;
+}
+
+/* =============================================
+   [ĐỒNG BỘ] Thu nhỏ popup SweetAlert2 toàn website
+   Giảm kích thước để không chiếm quá nhiều màn hình
+============================================= */
+.swal2-popup {
+  font-size: 14px !important;
+  width: 360px !important;
+  padding: 20px 16px !important;
+}
+.swal2-title {
+  font-size: 18px !important;
+}
+.swal2-icon {
+  width: 50px !important;
+  height: 50px !important;
+  margin: 10px auto !important;
+}
+.swal2-icon .swal2-icon-content {
+  font-size: 30px !important;
+}
+.swal2-html-container {
+  font-size: 13px !important;
+  margin: 8px 16px !important;
+}
+.swal2-actions {
+  margin-top: 12px !important;
+}
+.swal2-styled {
+  font-size: 13px !important;
+  padding: 8px 20px !important;
+}
+
+/* Hiệu ứng nảy trái tim khi click */
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+.animate-heartPop {
+  animation: heartPop 0.3s ease-out;
+}
+
+/* Hiệu ứng mờ dần (Fade In) */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
