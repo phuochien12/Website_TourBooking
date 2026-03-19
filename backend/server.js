@@ -347,11 +347,6 @@ app.post('/api/forgot-password', async (req, res) => {
     }
 });
 
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
 // 4. Xác nhận mã OTP
 app.post('/api/verify-otp', (req, res) => {
     const { Email, OTP } = req.body;
@@ -608,11 +603,7 @@ app.post('/api/dat-tour', async (req, res) => {
             });
             console.log("✅ Đã gửi email xác nhận đặt tour qua Resend đến:", Email);
         } catch (mailError) {
-            console.log("⚠️ Lỗi gửi email qua Resend:", mailError.message);
-        }
-
-        } catch (mailError) {
-            console.log("⚠️ Lỗi logic khi chuẩn bị email:", mailError);
+            console.log("⚠️ Lỗi gửi email xác nhận cho khách qua Resend:", mailError.message);
         }
 
         // --- BƯỚC 5: GỬI EMAIL THÔNG BÁO CHO ADMIN QUA RESEND ---
