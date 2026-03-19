@@ -129,8 +129,21 @@ function LichSuDatTour() {
                                 <div className="p-6 flex-grow">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <h3 className="text-xl font-bold text-gray-800 mb-2">{item.TenTour}</h3>
-                                            <p className="text-gray-600 text-sm">📅 Khởi hành: <strong>{new Date(item.NgayKhoiHanh).toLocaleDateString('vi-VN')}</strong></p>
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <h3 className="text-xl font-bold text-gray-800">{item.TenTour}</h3>
+                                                {new Date(item.NgayKhoiHanh) < new Date() && item.TrangThai !== 'Hủy' && (
+                                                    <span className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-md uppercase font-black border border-gray-200 flex items-center gap-1 shadow-sm">
+                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
+                                                        Đã kết thúc
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-gray-600 text-sm flex items-center gap-1.5">
+                                                <span className="opacity-60 text-xs">📅</span> 
+                                                Khởi hành: <strong className={new Date(item.NgayKhoiHanh) < new Date() ? 'text-gray-400' : 'text-navy'}>
+                                                    {new Date(item.NgayKhoiHanh).toLocaleDateString('vi-VN')}
+                                                </strong>
+                                            </p>
                                             <p className="text-gray-600 text-sm">👥 Số khách: {item.SoKhach}</p>
                                             <p className="text-gray-600 text-sm">🕒 Ngày đặt: {new Date(item.NgayDat).toLocaleDateString('vi-VN')}</p>
                                             {/* [MỚI] Hiển thị lý do hủy nếu đơn đã bị hủy */}
