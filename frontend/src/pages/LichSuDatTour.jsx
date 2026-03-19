@@ -129,15 +129,7 @@ function LichSuDatTour() {
                                 <div className="p-6 flex-grow">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <h3 className="text-xl font-bold text-gray-800">{item.TenTour}</h3>
-                                                {new Date(item.NgayKhoiHanh) < new Date() && item.TrangThai !== 'Hủy' && (
-                                                    <span className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-md uppercase font-black border border-gray-200 flex items-center gap-1 shadow-sm">
-                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
-                                                        Đã kết thúc
-                                                    </span>
-                                                )}
-                                            </div>
+                                            <h3 className="text-xl font-bold text-gray-800 mb-2">{item.TenTour}</h3>
                                             <p className="text-gray-600 text-sm flex items-center gap-1.5">
                                                 <span className="opacity-60 text-xs">📅</span> 
                                                 Khởi hành: <strong className={new Date(item.NgayKhoiHanh) < new Date() ? 'text-gray-400' : 'text-navy'}>
@@ -156,12 +148,13 @@ function LichSuDatTour() {
                                                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.TongTien)}
                                             </p>
                                             <div className="flex flex-col items-end gap-2">
-                                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold 
-                                            ${item.TrangThai === 'Đã thanh toán' || item.TrangThai === 'Đã xác nhận' ? 'bg-green-100 text-green-700' :
-                                                        item.TrangThai === 'Hủy' ? 'bg-red-100 text-red-700' :
-                                                            item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-700' :
-                                                                'bg-yellow-100 text-yellow-700'}`}>
-                                                    {item.TrangThai}
+                                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold shadow-sm
+                                            ${new Date(item.NgayKhoiHanh) < new Date() && item.TrangThai !== 'Hủy' ? 'bg-gray-500 text-white' :
+                                                        item.TrangThai === 'Đã thanh toán' || item.TrangThai === 'Đã xác nhận' ? 'bg-green-100 text-green-700' :
+                                                            item.TrangThai === 'Hủy' ? 'bg-red-100 text-red-700' :
+                                                                item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-700' :
+                                                                    'bg-yellow-100 text-yellow-700'}`}>
+                                                    {new Date(item.NgayKhoiHanh) < new Date() && item.TrangThai !== 'Hủy' ? 'Đã kết thúc' : item.TrangThai}
                                                 </span>
 
                                                 {/* ===== NÚT HỦY ĐƠN (Cho phép hủy khi chưa thanh toán hoặc đang chờ xử lý) ===== */}

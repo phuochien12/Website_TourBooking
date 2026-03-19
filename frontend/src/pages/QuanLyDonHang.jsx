@@ -144,14 +144,13 @@ function QuanLyDonHang() {
                                             <span className="text-xs text-gray-500 font-normal">({item.SoKhach} khách)</span>
                                         </td>
                                         <td className="border p-3 text-center">
-                                            {new Date(item.NgayKhoiHanh) < new Date().setHours(0,0,0,0) && 
-                                             (item.TrangThai === 'Đã xác nhận' || item.TrangThai === 'Đã thanh toán' || item.TrangThai === 'Hoàn thành') ? (
-                                                <span className="px-2 py-1 rounded-[8px] text-[10px] font-black uppercase tracking-widest bg-gray-500 text-white">
+                                            {new Date(item.NgayKhoiHanh) < new Date().setHours(0,0,0,0) && item.TrangThai !== 'Hủy' ? (
+                                                <span className="px-2 py-1 rounded-[8px] text-[10px] font-black uppercase tracking-widest bg-gray-500 text-white shadow-sm">
                                                     Đã kết thúc
                                                 </span>
                                             ) : (
-                                                <span className={`px-2 py-1 rounded-[8px] text-[10px] font-black uppercase tracking-widest
-                                                    ${item.TrangThai === 'Đã xác nhận' ? 'bg-green-100 text-green-700' :
+                                                <span className={`px-2 py-1 rounded-[8px] text-[10px] font-black uppercase tracking-widest shadow-sm
+                                                    ${item.TrangThai === 'Đã xác nhận' || item.TrangThai === 'Đã thanh toán' ? 'bg-green-100 text-green-700' :
                                                       item.TrangThai === 'Hủy' ? 'bg-red-100 text-red-700' :
                                                       item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-700' :
                                                       'bg-yellow-100 text-yellow-700'}`}>
