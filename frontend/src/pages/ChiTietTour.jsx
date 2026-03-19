@@ -30,17 +30,18 @@ function ChiTietTour() {
                 // Nếu tour chưa có lịch, hiện thông báo ngay khi vào trang
                 if (tourData.SoLich === 0) {
                     Swal.fire({
-                        title: 'Đang cập nhật lịch mới!',
-                        text: 'Tour này hiện chưa có ngày khởi hành chính thức. Bạn có muốn nhận tư vấn riêng qua Zalo để đặt chỗ trước không?',
+                        title: 'Thông báo!',
+                        text: 'Tour này hiện đang cập nhật lịch trình, bạn có muốn xem tiếp không? Hoặc liên hệ ngay qua trang liên hệ để được hỗ trợ!',
                         icon: 'info',
                         showCancelButton: true,
-                        confirmButtonColor: '#2563eb',
+                        confirmButtonColor: '#3085d6',
                         cancelButtonColor: '#6b7280',
-                        confirmButtonText: '💬 Nhấn Zalo tư vấn',
-                        cancelButtonText: 'Để tôi xem thêm'
+                        confirmButtonText: '📞 Liên hệ tư vấn',
+                        cancelButtonText: 'Để sau'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.open('https://zalo.me/0354858892', '_blank');
+                            // Chuyển sang trang liên hệ
+                            window.location.href = '/lien-he';
                         }
                     });
                 }
