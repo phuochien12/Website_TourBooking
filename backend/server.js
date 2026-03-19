@@ -134,10 +134,17 @@ app.get('/api/tours/:id', async (req, res) => {
         const { id } = req.params;
         const pool = await connectDB();
 
-        // Lấy thông tin Tour
+        // Lấy thông tin Tour kèm số lượng lịch khởi hành còn mở
         const tourResult = await pool.request()
             .input('Id', sql.Int, id)
-            .query('SELECT * FROM Tour WHERE MaTour = @Id');
+            .query(`
+                SELECT t.*, 
+                    (SELECT COUNT(*) FROM LichKhoiHanh l 
+                    WHERE l.MaTour = t.MaTour 
+                    AND l.TrangThai = N'Mở' 
+                    AND l.NgayKhoiHanh >= CAST(GETDATE() AS DATE)) as SoLich
+                FROM Tour t WHERE t.MaTour = @Id
+            `);
 
         // Lấy lịch trình
         const lichTrinhResult = await pool.request()
