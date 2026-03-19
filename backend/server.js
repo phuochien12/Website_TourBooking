@@ -182,7 +182,7 @@ app.get('/api/tours/:id/lich-khoi-hanh', async (req, res) => {
                 SELECT * FROM LichKhoiHanh 
                 WHERE MaTour = @MaTour 
                 AND TrangThai = N'Mở' 
-                AND NgayKhoiHanh > GETDATE()
+                AND NgayKhoiHanh >= CAST(GETDATE() AS DATE)
                 ORDER BY NgayKhoiHanh ASC
             `);
 
