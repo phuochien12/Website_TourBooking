@@ -14,7 +14,7 @@ function QuanLyHuongDanVien() {
     // Lấy danh sách HDV
     const fetchData = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/huong-dan-vien');
+            const res = await axios.get('/api/huong-dan-vien');
             setDanhSach(res.data);
         } catch (err) {
             console.error('Lỗi lấy danh sách HDV:', err);
@@ -57,7 +57,7 @@ function QuanLyHuongDanVien() {
         });
         if (result.isConfirmed) {
             try {
-                await axios.delete(`http://localhost:5000/api/huong-dan-vien/${id}`);
+                await axios.delete(`/api/huong-dan-vien/${id}`);
                 Swal.fire({ icon: 'success', title: 'Đã xóa!', timer: 1500, showConfirmButton: false });
                 fetchData();
             } catch (err) {
@@ -74,10 +74,10 @@ function QuanLyHuongDanVien() {
         }
         try {
             if (editId) {
-                await axios.put(`http://localhost:5000/api/huong-dan-vien/${editId}`, form);
+                await axios.put(`/api/huong-dan-vien/${editId}`, form);
                 Swal.fire({ icon: 'success', title: 'Cập nhật thành công!', timer: 1500, showConfirmButton: false });
             } else {
-                await axios.post('http://localhost:5000/api/huong-dan-vien', form);
+                await axios.post('/api/huong-dan-vien', form);
                 Swal.fire({ icon: 'success', title: 'Thêm thành công!', timer: 1500, showConfirmButton: false });
             }
             setShowForm(false);
@@ -101,7 +101,7 @@ function QuanLyHuongDanVien() {
         const formData = new FormData();
         formData.append('image', file);
         try {
-            const res = await axios.post('http://localhost:5000/api/upload-image', formData);
+            const res = await axios.post('/api/upload-image', formData);
             setForm(prev => ({ ...prev, AnhDaiDien: res.data.url }));
             Swal.fire({ icon: 'success', title: 'Đã tải ảnh!', timer: 1000, showConfirmButton: false });
         } catch {
