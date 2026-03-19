@@ -99,6 +99,10 @@ const TroLyAoAI = () => {
     const toggleOpen = () => {
         if (!hasMoved.current) {
             setIsOpen(!isOpen);
+            // Khi mở chat, đưa vị trí về mặc định (góc dưới phải) để tránh lỗi tràn màn hình
+            if (!isOpen) { 
+                setPosition({ x: 0, y: 0 });
+            }
         }
     };
     // -----------------------------------
@@ -252,7 +256,6 @@ const TroLyAoAI = () => {
                 </div>
             )}
         </>
-    );
     );
 };
 
