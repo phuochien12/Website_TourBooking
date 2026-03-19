@@ -92,7 +92,9 @@ app.get('/api/tours', async (req, res) => {
         let queryStr = `
             SELECT t.*, 
                    (SELECT COUNT(*) FROM LichKhoiHanh l 
-                    WHERE l.MaTour = t.MaTour AND l.TrangThai = N'Mở') as SoLich
+                    WHERE l.MaTour = t.MaTour 
+                    AND l.TrangThai = N'Mở' 
+                    AND l.NgayKhoiHanh >= CAST(GETDATE() AS DATE)) as SoLich
             FROM Tour t 
             WHERE t.TrangThai = 1`;
 
