@@ -148,12 +148,12 @@ function LichSuDatTour() {
                                                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.TongTien)}
                                             </p>
                                             <div className="flex flex-col items-end gap-2">
-                                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold shadow-sm
-                                            ${new Date(item.NgayKhoiHanh) < new Date() && item.TrangThai !== 'Hủy' ? 'bg-gray-500 text-white' :
+                                                <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold shadow-sm whitespace-nowrap transition-all duration-300
+                                                    ${new Date(item.NgayKhoiHanh) < new Date() && item.TrangThai !== 'Hủy' ? 'bg-gray-500 text-white' :
                                                         item.TrangThai === 'Đã thanh toán' || item.TrangThai === 'Đã xác nhận' ? 'bg-green-100 text-green-700' :
                                                             item.TrangThai === 'Hủy' ? 'bg-red-100 text-red-700' :
-                                                                item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-700' :
-                                                                    'bg-yellow-100 text-yellow-700'}`}>
+                                                                item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                                                                    'bg-orange-100 text-orange-700'}`}>
                                                     {new Date(item.NgayKhoiHanh) < new Date() && item.TrangThai !== 'Hủy' ? 'Đã kết thúc' : item.TrangThai}
                                                 </span>
 
