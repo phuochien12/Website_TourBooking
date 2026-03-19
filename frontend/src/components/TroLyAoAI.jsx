@@ -49,7 +49,7 @@ const TroLyAoAI = () => {
     };
 
     return (
-        <div className="fixed bottom-24 right-6 z-[9999]">
+        <div className="fixed bottom-24 left-6 z-[9999]">
             {/* Nút bong bóng chat */}
             {!isOpen && (
                 <button
@@ -58,7 +58,7 @@ const TroLyAoAI = () => {
                 >
                     <FaRobot size={28} />
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center animate-pulse">1</span>
-                    <div className="absolute right-20 bg-white text-navy px-4 py-2 rounded-xl border shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all">
+                    <div className="absolute left-20 bg-white text-navy px-4 py-2 rounded-xl border shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all">
                         Cần trợ lý tư vấn tour?
                     </div>
                 </button>
