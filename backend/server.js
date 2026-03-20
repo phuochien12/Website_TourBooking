@@ -747,13 +747,13 @@ app.put('/api/bookings/huy-don/:id', async (req, res) => {
             return res.status(400).json({ message: 'Đơn này đã được xử lý hoặc đã hoàn tất, vui lòng liên hệ hotline 0354858892 để được hỗ trợ hủy!' });
         }
 
-        // ===== BƯỚC 2: CẬP NHẬT TRẠNG THÁI THÀNH 'HỦY' =====
+        // ===== BƯỚC 2: CẬP NHẬT TRẠNG THÁI THÀNH 'KHÁCH ĐÃ HỦY' =====
         // [QUAN TRỌNG]: Lưu lý do hủy vào cột GhiChu để Admin xem lại được
-        const ghiChu = lyDoHuy ? `Lý do hủy: ${lyDoHuy}` : 'Khách tự hủy đơn';
+        const ghiChuStr = lyDoHuy ? `Lý do khách hủy: ${lyDoHuy}` : 'Khách tự hủy đơn trên hệ thống';
         await pool.request()
             .input('MaDon', sql.Int, id)
-            .input('GhiChu', sql.NVarChar, ghiChu)
-            .query("UPDATE DonDatTour SET TrangThai = N'Hủy', GhiChu = @GhiChu WHERE MaDon = @MaDon");
+            .input('GhiChu', sql.NVarChar, ghiChuStr)
+            .query("UPDATE DonDatTour SET TrangThai = N'Khách đã hủy', GhiChu = @GhiChu WHERE MaDon = @MaDon");
 
         // ===== BƯỚC 3: HOÀN LẠI SỐ CHỖ NGỒI (SLOT) =====
         await pool.request()
@@ -899,15 +899,42 @@ app.put('/api/bookings/huy-don/:id', async (req, res) => {
                 `
             };
 
-            // Gọi hàm gửi email (chạy ngầm, không block luồng chính)
-            // Nghĩa là: API sẽ trả kết quả cho Frontend ngay lập tức,
-            // còn email sẽ tự gửi đi phía sau
             transporter.sendMail(mailHuyTour, (error, info) => {
                 if (error) {
-                    console.log("⚠️ Gửi email hủy tour thất bại:", error.message);
+                    console.log("⚠️ Gửi email hủy tour cho khách thất bại:", error.message);
                 } else {
-                    console.log("✅ Đã gửi email xác nhận hủy tour đến:", don.Email);
+                    console.log("✅ Đã gửi email xác nhận hủy tour đến khách:", don.Email);
                 }
+            });
+
+            // ===== BƯỚC 6: GỬI THÔNG BÁO CHO ADMIN PHƯỚC HIỀN =====
+            const mailNotifyAdmin = {
+                from: process.env.EMAIL_USER || '"Hệ Thống Thông Báo" <tourbooking.dummy@gmail.com>',
+                to: 'phuochien847@gmail.com', // Email của bạn
+                subject: `🚨 THÔNG BÁO: KHÁCH HÀNG HỦY TOUR #${id}`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #f97316; border-radius: 10px;">
+                        <h2 style="color: #ea580c; margin-top: 0;">Khách Hàng Vừa Tự Hủy Đơn!</h2>
+                        <p>Chào Admin <b>Phước Hiền</b>,</p>
+                        <p>Hệ thống ghi nhận có một đơn đặt tour vừa được khách hàng tự hủy từ trang cá nhân.</p>
+                        <hr style="border: 0; border-top: 1px solid #fed7aa; margin: 20px 0;">
+                        <ul style="list-style: none; padding: 0;">
+                            <li><b>Mã đơn:</b> #${id}</li>
+                            <li><b>Khách hàng:</b> ${don.HoTen} (${don.SoDienThoai})</li>
+                            <li><b>Tour đặt:</b> ${don.TenTour}</li>
+                            <li><b>Lý do hủy:</b> ${lyDoHuy || 'Khách không nhập lý do'}</li>
+                            <li><b>Số tiền đã đặt:</b> ${new Intl.NumberFormat('vi-VN').format(don.TongTien)} VNĐ</li>
+                        </ul>
+                        <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">
+                            Vui lòng truy cập <a href="https://dulichviet.click/admin/don-hang" style="color: #2563eb; font-weight: bold;">Trang Quản Trị</a> để xem chi tiết và xử lý hoàn tiền nếu cần.
+                        </p>
+                    </div>
+                `
+            };
+
+            transporter.sendMail(mailNotifyAdmin, (err, info) => {
+                if (err) console.log("⚠️ Không thể gửi mail báo Admin:", err.message);
+                else console.log("✅ Đã gửi mail báo Admin Phước Hiền về việc hủy đơn.");
             });
 
         } catch (mailError) {
