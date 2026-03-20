@@ -245,8 +245,12 @@ function App() {
                             {user ? (
                                 <li className="relative group ml-4">
                                     <div className="flex items-center gap-2 cursor-pointer py-2 group/admin">
-                                        <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm border-2 transition-all duration-500 ${!isScrolled && pathname === '/' ? 'bg-white/20 border-white shadow-[0_0_20px_rgba(255,255,255,0.5)] text-white' : 'bg-primary/10 border-primary/20 text-primary'}`}>
-                                            {user.HoTen.charAt(0).toUpperCase()}
+                                        <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm border-2 transition-all duration-500 overflow-hidden ${!isScrolled && pathname === '/' ? 'bg-white/20 border-white shadow-[0_0_20px_rgba(255,255,255,0.5)] text-white' : 'bg-primary/10 border-primary/20 text-primary'}`}>
+                                            {user.AnhDaiDien ? (
+                                                <img src={user.AnhDaiDien} alt="Avatar" className="w-full h-full object-cover" />
+                                            ) : (
+                                                user.HoTen.charAt(0).toUpperCase()
+                                            )}
                                         </div>
                                         <div className="flex flex-col leading-tight text-left">
                                             <span className={`text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-500 ${!isScrolled && pathname === '/' ? 'text-accent drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-primary'}`}>
@@ -352,8 +356,12 @@ function App() {
                                 </div>
                                 
                                 <div className="flex items-center gap-3 py-2">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/40 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-lg shadow-inner">
-                                        {user.HoTen.charAt(0).toUpperCase()}
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/40 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-lg shadow-inner overflow-hidden">
+                                        {user.AnhDaiDien ? (
+                                            <img src={user.AnhDaiDien} alt="Avatar" className="w-full h-full object-cover" />
+                                        ) : (
+                                            user.HoTen.charAt(0).toUpperCase()
+                                        )}
                                     </div>
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-white font-bold text-sm truncate">{user.HoTen}</span>
