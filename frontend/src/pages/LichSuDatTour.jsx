@@ -139,7 +139,7 @@ function LichSuDatTour() {
                                             <p className="text-gray-600 text-sm">👥 Số khách: {item.SoKhach}</p>
                                             <p className="text-gray-600 text-sm">🕒 Ngày đặt: {new Date(item.NgayDat).toLocaleDateString('vi-VN')}</p>
                                             {/* [MỚI] Hiển thị lý do hủy nếu đơn đã bị hủy */}
-                                            {(item.TrangThai === 'Hủy' || item.TrangThai === 'Khách đã hủy') && item.GhiChu && (
+                                            {(item.TrangThai === 'Đã hủy' || item.TrangThai === 'Khách đã hủy') && item.GhiChu && (
                                                 <p className="text-red-500 text-sm mt-1 italic">💬 {item.GhiChu}</p>
                                             )}
                                         </div>
@@ -149,12 +149,12 @@ function LichSuDatTour() {
                                             </p>
                                             <div className="flex flex-col items-end gap-2">
                                                 <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold shadow-sm whitespace-nowrap transition-all duration-300
-                                                    ${new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Hủy' && item.TrangThai !== 'Khách đã hủy') ? 'bg-gray-500 text-white' :
+                                                    ${new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy') ? 'bg-gray-500 text-white' :
                                                         item.TrangThai === 'Đã thanh toán' || item.TrangThai === 'Đã xác nhận' ? 'bg-green-100 text-green-700' :
-                                                            item.TrangThai === 'Hủy' || item.TrangThai === 'Khách đã hủy' ? 'bg-orange-600 text-white shadow-orange-200' :
+                                                            item.TrangThai === 'Đã hủy' || item.TrangThai === 'Khách đã hủy' ? 'bg-orange-600 text-white shadow-orange-200' :
                                                                 item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
                                                                     'bg-orange-100 text-orange-700'}`}>
-                                                    {new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Hủy' && item.TrangThai !== 'Khách đã hủy') ? 'Đã kết thúc' : item.TrangThai}
+                                                    {new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy') ? 'Đã kết thúc' : item.TrangThai}
                                                 </span>
 
                                                 {/* ===== NÚT HỦY ĐƠN (Cho phép hủy khi chưa thanh toán hoặc đang chờ xử lý) ===== */}

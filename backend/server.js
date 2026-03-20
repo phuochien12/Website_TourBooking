@@ -942,7 +942,7 @@ app.put('/api/bookings/huy-don/:id', async (req, res) => {
             console.log("⚠️ Lỗi khi chuẩn bị email hủy tour:", mailError);
         }
 
-        console.log(`🚫 Đơn #${id} đã bị hủy. Lý do: ${ghiChu}`);
+        console.log(`🚫 Đơn #${id} đã bị hủy. Lý do: ${ghiChuStr}`);
         res.json({ success: true, message: 'Đã hủy đơn thành công! Chúng tôi sẽ xử lý hoàn tiền trong vòng 24h.' });
 
     } catch (err) {
@@ -1526,14 +1526,14 @@ app.put('/api/admin/schedules/cancel/:id', async (req, res) => {
         // 3. Cập nhật trạng thái Lịch thành 'Hủy'
         await pool.request()
             .input('MaLich', sql.Int, id)
-            .query("UPDATE LichKhoiHanh SET TrangThai = N'Hủy' WHERE MaLich = @MaLich");
+            .query("UPDATE LichKhoiHanh SET TrangThai = N'Đã hủy' WHERE MaLich = @MaLich");
 
         // 4. Cập nhật tất cả các đơn hàng liên quan
         const ghiChuMoi = `Hủy bởi Admin - Lý do: ${lyDoHuy || 'Sự cố bất khả kháng'}`;
         await pool.request()
             .input('MaLich', sql.Int, id)
             .input('GhiChu', sql.NVarChar, ghiChuMoi)
-            .query("UPDATE DonDatTour SET TrangThai = N'Hủy', GhiChu = @GhiChu WHERE MaLich = @MaLich AND TrangThai != N'Hủy'");
+            .query("UPDATE DonDatTour SET TrangThai = N'Đã hủy', GhiChu = @GhiChu WHERE MaLich = @MaLich AND TrangThai != N'Hủy'");
 
         // 5. Gửi email thông báo cho từng khách
         for (const khách of dskhach.recordset) {
