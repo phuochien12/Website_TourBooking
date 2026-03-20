@@ -34,6 +34,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     }
 });
+const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 
