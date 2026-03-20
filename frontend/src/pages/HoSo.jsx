@@ -8,14 +8,50 @@ function HoSo() {
         HoTen: user?.HoTen || '',
         Email: user?.Email || '',
         SoDienThoai: user?.SoDienThoai || '',
+        AnhDaiDien: user?.AnhDaiDien || '',
         MatKhauMoi: '',
         XacNhanMatKhau: ''
     });
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     // [Premium UI Check] - Đảm bảo giao diện hiện đại
     const inputStyle = "w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 placeholder:text-white/20";
     const labelStyle = "block text-sm font-bold text-white/60 mb-2 ml-1 uppercase tracking-wider";
+
+    // Xử lý tải ảnh đại diện lên Cloudinary
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Kiểm tra định dạng
+        if (!file.type.startsWith('image/')) {
+            return Swal.fire('Lỗi', 'Vui lòng chọn file hình ảnh!', 'error');
+        }
+
+        setUploading(true);
+        const data = new FormData();
+        data.append('image', file);
+
+        try {
+            const res = await axios.post('/api/upload-image', data);
+            if (res.data.success) {
+                setFormData({ ...formData, AnhDaiDien: res.data.url });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đã tải ảnh lên!',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        } catch (err) {
+            Swal.fire('Lỗi', 'Không thể tải ảnh lên server!', 'error');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,12 +66,19 @@ function HoSo() {
                 HoTen: formData.HoTen,
                 Email: formData.Email,
                 SoDienThoai: formData.SoDienThoai,
+                AnhDaiDien: formData.AnhDaiDien,
                 MatKhau: formData.MatKhauMoi || undefined
             });
 
             if (res.data.success) {
                 // Cập nhật lại localStorage
-                const newUser = { ...user, HoTen: formData.HoTen, Email: formData.Email, SoDienThoai: formData.SoDienThoai };
+                const newUser = { 
+                    ...user, 
+                    HoTen: formData.HoTen, 
+                    Email: formData.Email, 
+                    SoDienThoai: formData.SoDienThoai,
+                    AnhDaiDien: formData.AnhDaiDien
+                };
                 localStorage.setItem('user', JSON.stringify(newUser));
                 setUser(newUser);
 
@@ -67,13 +110,39 @@ function HoSo() {
                     {/* Left Side: Avatar Card */}
                     <div className="w-full md:w-1/3">
                         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 text-center sticky top-32">
-                            <div className="relative inline-block mb-6">
-                                <div className="w-32 h-32 rounded-full border-4 border-primary/30 p-1">
-                                    <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-5xl font-black shadow-2xl">
-                                        {user?.HoTen?.charAt(0).toUpperCase()}
-                                    </div>
+                            <div className="relative inline-block mb-6 group">
+                                <div className="w-32 h-32 rounded-full border-4 border-primary/30 p-1 relative overflow-hidden">
+                                    {uploading ? (
+                                        <div className="w-full h-full rounded-full bg-navy/50 flex items-center justify-center">
+                                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {formData.AnhDaiDien ? (
+                                                <img 
+                                                    src={formData.AnhDaiDien} 
+                                                    alt="Avatar" 
+                                                    className="w-full h-full rounded-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-5xl font-black shadow-2xl">
+                                                    {user?.HoTen?.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    
+                                    {/* Overlay thay đổi ảnh */}
+                                    <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span className="text-[10px] text-white font-bold uppercase tracking-widest">Đổi ảnh</span>
+                                        <input type="file" className="hidden" onChange={handleAvatarChange} accept="image/*" />
+                                    </label>
                                 </div>
-                                <div className="absolute bottom-1 right-1 w-8 h-8 bg-green-500 border-4 border-[#0f172a] rounded-full"></div>
+                                <div className="absolute bottom-1 right-1 w-8 h-8 bg-green-500 border-4 border-[#0f172a] rounded-full z-10"></div>
                             </div>
 
                             <h2 className="text-2xl font-bold text-white mb-1">{user?.HoTen}</h2>
@@ -180,7 +249,7 @@ function HoSo() {
                                         {loading ? (
                                             <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                         ) : (
-                                            <>LƯU THAY ĐỔI</>
+                                            <>{uploading ? 'ĐANG TẢI ẢNH...' : 'LƯU THAY ĐỔI'}</>
                                         )}
                                     </button>
                                 </div>

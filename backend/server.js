@@ -25,10 +25,15 @@ const { layCauTraLoiAI } = require('./XuLyAI');
 
 
 
-const { Resend } = require('resend');
-
-// CẤU HÌNH GỬI EMAIL (Resend.com)
-// Sử dụng RESEND_API_KEY trong file .env
+// CẤU HÌNH GỬI EMAIL (Nodemailer cho Gmail hoặc Resend.com)
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 
@@ -992,7 +997,7 @@ app.get('/api/admin/users', async (req, res) => {
 app.put('/api/admin/users/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { MaQuyen, TrangThai, HoTen, Email, SoDienThoai } = req.body;
+        const { MaQuyen, TrangThai, HoTen, Email, SoDienThoai, AnhDaiDien, MatKhau, DiaChi } = req.body;
         const pool = await connectDB();
 
         // Kiểm tra trùng lặp SĐT / Email nếu có thay đổi
@@ -1021,6 +1026,9 @@ app.put('/api/admin/users/:id', async (req, res) => {
         if (HoTen !== undefined) fields.push('HoTen = @HoTen');
         if (Email !== undefined) fields.push('Email = @Email');
         if (SoDienThoai !== undefined) fields.push('SoDienThoai = @SoDienThoai');
+        if (AnhDaiDien !== undefined) fields.push('AnhDaiDien = @AnhDaiDien');
+        if (MatKhau !== undefined) fields.push('MatKhau = @MatKhau');
+        if (DiaChi !== undefined) fields.push('DiaChi = @DiaChi');
 
         if (fields.length === 0) return res.json({ success: true }); // Không có gì đổi
 
@@ -1032,6 +1040,9 @@ app.put('/api/admin/users/:id', async (req, res) => {
         if (HoTen !== undefined) request.input('HoTen', sql.NVarChar, HoTen);
         if (Email !== undefined) request.input('Email', sql.VarChar, Email);
         if (SoDienThoai !== undefined) request.input('SoDienThoai', sql.VarChar, SoDienThoai);
+        if (AnhDaiDien !== undefined) request.input('AnhDaiDien', sql.VarChar, AnhDaiDien);
+        if (MatKhau !== undefined) request.input('MatKhau', sql.VarChar, MatKhau);
+        if (DiaChi !== undefined) request.input('DiaChi', sql.NVarChar, DiaChi);
 
         await request.query(queryStr);
         res.json({ message: 'Cập nhật thành công', success: true });
