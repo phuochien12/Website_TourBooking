@@ -210,7 +210,9 @@ function DatTour() {
                                         {user && hoTen && soDienThoai && email && (
                                             <div className="mb-10 bg-gradient-to-r from-navy to-[#2c3e50] p-8 rounded-[32px] text-white shadow-xl shadow-navy/10 relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-150 transition-transform duration-1000">
-                                                    <LogoIcon className="w-32 h-32 text-white" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-32 h-32 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
                                                 </div>
                                                 <div className="relative z-10">
                                                     <p className="text-xs font-black uppercase tracking-[3px] text-primary mb-2 opacity-80">Thanh toán nhanh một chạm</p>
