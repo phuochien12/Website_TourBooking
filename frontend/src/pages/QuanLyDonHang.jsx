@@ -144,18 +144,18 @@ function QuanLyDonHang() {
                                             <span className="text-xs text-gray-500 font-normal">({item.SoKhach} khách)</span>
                                         </td>
                                         <td className="border p-3 text-center">
-                                            {new Date(item.NgayKhoiHanh) < new Date().setHours(0,0,0,0) && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy') ? (
+                                            {new Date(item.NgayKhoiHanh) < new Date().setHours(0,0,0,0) && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy' && item.TrangThai !== 'Hủy') ? (
                                                 <span className="px-3 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest bg-gray-500 text-white shadow-sm whitespace-nowrap">
                                                     Đã kết thúc
                                                 </span>
                                             ) : (
                                                 <span className={`px-3 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest shadow-sm whitespace-nowrap
                                                     ${item.TrangThai === 'Đã xác nhận' || item.TrangThai === 'Đã thanh toán' ? 'bg-green-100 text-green-700' :
-                                                      item.TrangThai === 'Đã hủy' ? 'bg-red-100 text-red-700' :
+                                                      item.TrangThai === 'Đã hủy' || item.TrangThai === 'Hủy' ? 'bg-red-100 text-red-700' :
                                                       item.TrangThai === 'Khách đã hủy' ? 'bg-orange-600 text-white shadow-orange-200' :
                                                       item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
                                                       'bg-orange-100 text-orange-700'}`}>
-                                                    {item.TrangThai}
+                                                    {item.TrangThai === 'Hủy' ? 'Đã hủy' : item.TrangThai}
                                                 </span>
                                             )}
                                         </td>
