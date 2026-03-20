@@ -18,8 +18,7 @@ function DatTour() {
     const [soDienThoai, setSoDienThoai] = useState(user ? user.SoDienThoai || '' : '');
     const [tinhThanh, setTinhThanh] = useState('Thành phố Cần Thơ');
     const [phuongXa, setPhuongXa] = useState('Phường Bình Thủy');
-    const [diaChi, setDiaChi] = useState(user?.DiaChi || 'Việt Nam');
-    const [giaoHangKhac, setGiaoHangKhac] = useState(false);
+    const [diaChi, setDiaChi] = useState(user?.DiaChi || '');
     const [soKhach, setSoKhach] = useState(1);
     const [maLichChon, setMaLichChon] = useState('');
     const [phuongThuc, setPhuongThuc] = useState('chuyen_khoan');
@@ -62,6 +61,25 @@ function DatTour() {
                 if (resLich.data.length > 0) {
                     setLichKhoiHanh(resLich.data);
                     setMaLichChon(resLich.data[0].MaLich);
+                }
+
+                // FETCH THÊM THÔNG TIN USER MỚI NHẤT
+                if (user) {
+                    try {
+                        const resUser = await axios.get(`/api/users/${user.MaNguoiDung}`);
+                        if (resUser.data) {
+                            const u = resUser.data;
+                            setHoTen(u.HoTen || '');
+                            setEmail(u.Email || '');
+                            setSoDienThoai(u.SoDienThoai || '');
+                            if (u.DiaChi) setDiaChi(u.DiaChi);
+                            
+                            // Lưu lại vào localStorage để đồng bộ các trang khác
+                            localStorage.setItem('user', JSON.stringify({ ...user, ...u }));
+                        }
+                    } catch (uErr) {
+                        console.log("Không thể fetch thông tin user mới nhất, dùng tạm cache.");
+                    }
                 }
             } catch (err) {
                 console.error("Lỗi fetch dữ liệu:", err);
@@ -176,10 +194,50 @@ function DatTour() {
                                 {step === 1 ? (
                                     /* STEP 1: THÔNG TIN CHI TIẾT (DESIGN MỚI THEO MẪU) */
                                     <>
-                                        <h2 className="text-2xl font-black text-navy mb-8 flex items-center gap-4">
-                                            <span className="w-1.5 h-8 bg-primary rounded-full"></span>
-                                            THÔNG TIN THANH TOÁN
+                                        <h2 className="text-2xl font-black text-navy mb-8 flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <span className="w-1.5 h-8 bg-primary rounded-full"></span>
+                                                THÔNG TIN THANH TOÁN
+                                            </div>
+                                            {user && (
+                                                <div className="hidden md:flex items-center gap-3 bg-primary/10 px-4 py-2 rounded-2xl border border-primary/20">
+                                                    <p className="text-[11px] font-bold text-primary italic">Bạn đã đăng nhập, hệ thống sẽ tự điền thông tin</p>
+                                                    <span className="text-sm">✨</span>
+                                                </div>
+                                            )}
                                         </h2>
+                                        
+                                        {user && hoTen && soDienThoai && email && (
+                                            <div className="mb-10 bg-gradient-to-r from-navy to-[#2c3e50] p-8 rounded-[32px] text-white shadow-xl shadow-navy/10 relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-150 transition-transform duration-1000">
+                                                    <LogoIcon className="w-32 h-32 text-white" />
+                                                </div>
+                                                <div className="relative z-10">
+                                                    <p className="text-xs font-black uppercase tracking-[3px] text-primary mb-2 opacity-80">Thanh toán nhanh một chạm</p>
+                                                    <h3 className="text-xl font-bold mb-4">Chào {hoTen}, bạn muốn dùng hồ sơ đã lưu?</h3>
+                                                    <div className="flex flex-wrap gap-3">
+                                                        <button 
+                                                            type="button"
+                                                            onClick={(e) => handleToStep2(e)}
+                                                            className="bg-primary text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-lg shadow-primary/20 hover:-translate-y-1 active:scale-95 flex items-center gap-2"
+                                                        >
+                                                            <span>➔</span> SỬ DỤNG HỒ SƠ & THANH TOÁN NGAY
+                                                        </button>
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setHoTen(''); setSoDienThoai(''); setDiaChi('');
+                                                                Swal.fire({ icon: 'info', title: 'Đã xóa!', text: 'Vui lòng nhập thông tin mới.', timer: 1000, showConfirmButton: false });
+                                                            }}
+                                                            className="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest border border-white/10 transition-all"
+                                                        >
+                                                            Nhập thông tin khác
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <form onSubmit={handleToStep2} className="space-y-6">
                                             {/* Họ và tên (Full Width) */}
                                             <div className="space-y-2">

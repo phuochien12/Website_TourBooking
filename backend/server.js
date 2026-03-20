@@ -578,68 +578,85 @@ app.post('/api/dat-tour', async (req, res) => {
 
         // --- BƯỚC 4: GỬI EMAIL XÁC NHẬN QUA RESEND ---
         try {
+        // --- BƯỚC 4: GỬI EMAIL XÁC NHẬN QUA RESEND ---
+        try {
+            // [QUAN TRỌNG]: Mã hóa nội dung chuyển khoản để link mã QR không bị lỗi dấu cách
+            const qrAddInfo = encodeURIComponent(`DULICHVIET ${MaDon} ${HoTen}`);
+            const qrAccountName = encodeURIComponent("CONG TY DU LICH VIET");
+            const qrUrl = `https://img.vietqr.io/image/MB-0354858892-compact2.png?amount=${TongTien}&addInfo=${qrAddInfo}&accountName=${qrAccountName}`;
+
             await resend.emails.send({
                 from: 'Du Lịch Việt <hotro@dulichviet.click>',
-                to: [Email], // Gửi đến email của khách hàng
-                subject: 'Xác nhận Đặt Tour Thành Công - Du Lịch Việt',
+                to: [Email],
+                subject: `🎫 XÁC NHẬN ĐẶT TOUR #${MaDon} THÀNH CÔNG - DU LỊCH VIỆT`,
                 html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
-                        <h2 style="color: #2563eb; text-align: center; text-transform: uppercase;">Xác nhận Đặt Tour Thành Công</h2>
-                        <p>Xin chào <b>${HoTen}</b>,</p>
-                        <p>Chúc mừng quý khách đã đặt tour thành công! Hệ thống Du Lịch Việt đã ghi nhận yêu cầu của quý khách với thông tin chi tiết như sau:</p>
-                        
-                        <div style="background-color: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #e2e8f0;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <tr>
-                                    <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; text-transform: uppercase;"><b>Mã đơn hàng:</b></td>
-                                    <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; text-align: right; color: #dc2626; font-weight: bold; font-size: 18px;">#${MaDon}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; text-transform: uppercase;"><b>Số lượng khách:</b></td>
-                                    <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: bold;">${SoKhach} người</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px 0; color: #64748b; font-size: 13px; text-transform: uppercase;"><b>Tổng thanh toán:</b></td>
-                                    <td style="padding: 10px 0; text-align: right; color: #059669; font-weight: bold; font-size: 20px;">${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ</td>
-                                </tr>
-                            </table>
+                    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                        <div style="background: linear-gradient(135deg, #1e3a8a, #1d4ed8); padding: 40px 20px; text-align: center; color: #ffffff;">
+                            <h1 style="margin: 0; font-size: 28px; letter-spacing: 1px;">XÁC NHẬN ĐẶT TOUR</h1>
+                            <p style="margin: 10px 0 0; opacity: 0.9; font-size: 16px;">Cảm ơn quý khách đã tin tưởng lựa chọn dịch vụ của chúng tôi</p>
                         </div>
+                        
+                        <div style="padding: 30px;">
+                            <p style="font-size: 16px; color: #334155;">Xin chào <b>${HoTen}</b>,</p>
+                            <p style="font-size: 15px; color: #64748b; line-height: 1.6;">Yêu cầu đặt tour của bạn đã được hệ thống ghi nhận thành công. Dưới đây là thông tin chi tiết đơn hàng:</p>
+                            
+                            <div style="background-color: #f8fafc; border-radius: 12px; padding: 25px; margin: 25px 0; border: 1px solid #f1f5f9;">
+                                <table style="width: 100%; font-size: 15px;">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #94a3b8;">Mã đơn hàng:</td>
+                                        <td style="padding: 8px 0; text-align: right; font-weight: bold; color: #1e3a8a;">#${MaDon}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #94a3b8;">Số lượng khách:</td>
+                                        <td style="padding: 8px 0; text-align: right; font-weight: bold;">${SoKhach} người</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 15px 0 0; color: #94a3b8; border-top: 1px solid #e2e8f0;">Tổng thanh toán:</td>
+                                        <td style="padding: 15px 0 0; text-align: right; border-top: 1px solid #e2e8f0; font-size: 22px; font-weight: 900; color: #e11d48;">
+                                            ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
 
-                        ${PhuongThucThanhToan === 'chuyen_khoan' ? `
-                        <div style="background-color: #eff6ff; padding: 20px; border-radius: 12px; border: 1px dashed #3b82f6;">
-                            <h3 style="color: #1e40af; margin-top: 0; font-size: 16px;">HƯỚNG DẪN THANH TOÁN CHUYỂN KHOẢN:</h3>
-                            <p style="color: #374151; font-size: 14px;">Quý khách vui lòng thực hiện chuyển khoản theo thông tin dưới đây:</p>
-                            <ul style="list-style-type: none; padding-left: 0; color: #1f2937; line-height: 1.8; font-size: 14px;">
-                                <li><b>Ngân hàng:</b> MB Bank (Ngân hàng Quân Đội)</li>
-                                <li><b>Chủ tài khoản:</b> CONG TY DU LICH VIET</li>
-                                <li><b>Số tài khoản:</b> <span style="font-size: 18px; color: #2563eb; font-weight: bold;">0354858892</span></li>
-                                <li><b>Nội dung chuyển khoản:</b> <span style="background-color: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase;">DULICHVIET ${MaDon} ${HoTen}</span></li>
-                            </ul>
-                            <div style="text-align: center; margin-top: 25px;">
-                                <img src="https://img.vietqr.io/image/MB-0354858892-compact2.png?amount=${TongTien}&addInfo=DULICHVIET ${MaDon} ${HoTen}&accountName=CONG TY DU LICH VIET" alt="QR Code" style="width: 200px; height: 200px; border: 4px solid white; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.1);" />
-                                <p style="font-size: 12px; color: #64748b; margin-top: 10px; font-style: italic;">Quét mã bằng App Ngân hàng để thanh toán nhanh 24/7</p>
+                            ${PhuongThucThanhToan === 'chuyen_khoan' ? `
+                                <div style="background-color: #fffbeb; border: 2px dashed #f59e0b; border-radius: 12px; padding: 25px;">
+                                    <h3 style="color: #92400e; margin-top: 0; font-size: 18px; text-align: center;">🛡️ THÔNG TIN CHUYỂN KHOẢN</h3>
+                                    <div style="margin: 20px 0; font-size: 14px; color: #78350f;">
+                                        <p style="margin: 5px 0;">🏦 Ngân hàng: <b>MB Bank (Quân Đội)</b></p>
+                                        <p style="margin: 5px 0;">👤 Chủ TK: <b>CONG TY DU LICH VIET</b></p>
+                                        <p style="margin: 5px 0;">💳 Số TK: <b style="font-size: 20px; color: #d97706;">0354858892</b></p>
+                                        <p style="margin: 5px 0;">📝 Nội dung: <b style="background: white; padding: 4px 8px; border-radius: 4px; color: #dc2626;">DULICHVIET ${MaDon} ${HoTen}</b></p>
+                                    </div>
+                                    <div style="text-align: center; margin-top: 20px;">
+                                        <img src="${qrUrl}" alt="QR Thanh Toán" style="width: 220px; height: 220px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                                        <p style="font-size: 12px; color: #92400e; margin-top: 15px;">Sử dụng App Ngân hàng quét mã để thanh toán ngay</p>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div style="background-color: #f0fdf4; border: 2px dashed #166534; border-radius: 12px; padding: 25px; text-align: center;">
+                                    <h3 style="color: #166534; margin-top: 0; font-size: 18px;">📍 THANH TOÁN TẠI VĂN PHÒNG</h3>
+                                    <p style="font-size: 14px; color: #166534;">Quý khách vui lòng đến trực tiếp văn phòng trong vòng <b>24 giờ</b> để hoàn tất thanh toán.</p>
+                                    <p style="font-weight: bold; margin-top: 10px; color: #14532d;">Trụ sở chính: 273 Nguyễn Văn Linh, Q. Ninh Kiều, TP. Cần Thơ</p>
+                                </div>
+                            `}
+
+                            <div style="margin-top: 35px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 30px;">
+                                <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Mọi thắc mắc vui lòng liên hệ hotline:</p>
+                                <a href="tel:0354858892" style="font-size: 24px; font-weight: bold; color: #1d4ed8; text-decoration: none;">0354858892</a>
                             </div>
                         </div>
-                        ` : `
-                        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 12px; border: 1px dashed #22c55e;">
-                            <h3 style="color: #166534; margin-top: 0; font-size: 16px;">THANH TOÁN TẠI VĂN PHÒNG:</h3>
-                            <p style="color: #374151; font-size: 14px;">Hệ thống sẽ giữ chỗ cho quý khách trong vòng 24 giờ. Quý khách vui lòng đến địa chỉ sau:</p>
-                            <ul style="color: #374151; line-height: 1.6; font-size: 14px;">
-                                <li><b>Trụ sở Cần Thơ:</b> 273 Nguyễn Văn Linh, Q. Ninh Kiều, TP. Cần Thơ</li>
-                                <li><b>VP Hồ Chí Minh:</b> 123 Lê Lợi, Quận 1, Tp. Hồ Chí Minh</li>
-                            </ul>
-                            <p style="font-size: 13px; color: #166534; font-weight: bold;">Vui lòng xuất trình mã đơn hàng #${MaDon} khi đến quầy.</p>
+                        
+                        <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f1f5f9;">
+                            <p style="font-size: 12px; color: #94a3b8; margin: 0;">&copy; 2026 Du Lịch Việt - All rights reserved</p>
                         </div>
-                        `}
-
-                        <p style="margin-top: 20px;">Vui lòng kiểm tra lại thông tin. Nếu có bất kỳ sai sót nào, quý khách vui lòng liên hệ ngay hotline <b>0354858892</b> để được hỗ trợ.</p>
-                        <p style="margin-top: 20px; text-align: center; color: #6b7280; font-size: 12px;">
-                            Đây là email tự động, vui lòng không trả lời email này.<br/>
-                            &copy; 2026 Công Ty Du Lịch Việt.
-                        </p>
                     </div>
                 `
             });
+            console.log("✅ Đã gửi email xác nhận đặt tour qua Resend đến:", Email);
+        } catch (mailError) {
+            console.log("⚠️ Lỗi gửi email xác nhận cho khách qua Resend:", mailError.message);
+        }
             console.log("✅ Đã gửi email xác nhận đặt tour qua Resend đến:", Email);
         } catch (mailError) {
             console.log("⚠️ Lỗi gửi email xác nhận cho khách qua Resend:", mailError.message);
@@ -651,38 +668,47 @@ app.post('/api/dat-tour', async (req, res) => {
             await resend.emails.send({
                 from: 'Hệ Thống Tour <hotro@dulichviet.click>',
                 to: [adminEmail],
-                reply_to: 'phuochien847@gmail.com', // Giúp Gmail tin tưởng hơn
-                subject: `Thông báo đơn đặt tour mới từ: ${HoTen} - Website Du Lịch Việt`,
+                reply_to: 'phuochien847@gmail.com',
+                subject: `🚨 ĐƠN MỚI #${MaDon} - ${HoTen} - DU LỊCH VIỆT`,
                 html: `
-                    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 25px; border-radius: 12px; color: #333;">
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="https://website-tour-booking.vercel.app/logo.png" alt="Logo" style="width: 120px; margin-bottom: 10px;">
-                            <h2 style="color: #2c3e50; margin: 0;">THÔNG BÁO ĐƠN HÀNG MỚI</h2>
-                            <p style="color: #666; font-size: 14px;">Bạn có một yêu cầu đặt tour vừa được gửi từ Website.</p>
+                    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid #1e3a8a; padding: 0; border-radius: 16px; overflow: hidden;">
+                        <div style="background-color: #1e3a8a; color: white; padding: 30px; text-align: center;">
+                            <h2 style="margin: 0; font-size: 24px; letter-spacing: 1px;">THÔNG BÁO ĐƠN HÀNG MỚI</h2>
+                            <p style="margin: 10px 0 0; opacity: 0.8;">Hệ thống vừa nhận được yêu cầu đặt tour mới</p>
                         </div>
                         
-                        <div style="background-color: #f9fafb; padding: 20px; border-radius: 10px; border-left: 5px solid #1a5f2e;">
-                            <h3 style="color: #1a5f2e; margin-top: 0;">Thông tin khách hàng</h3>
-                            <p style="margin: 8px 0;"><strong>Họ và tên:</strong> ${HoTen}</p>
-                            <p style="margin: 8px 0;"><strong>Email:</strong> ${Email}</p>
-                            <p style="margin: 8px 0;"><strong>Điện thoại:</strong> ${SoDienThoai}</p>
-                            <p style="margin: 8px 0;"><strong>Số lượng:</strong> ${SoKhach} người</p>
+                        <div style="padding: 25px;">
+                            <div style="background-color: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                                <h3 style="color: #1e3a8a; margin-top: 0; border-bottom: 1px solid #cbd5e1; padding-bottom: 10px;">👤 Thông tin khách hàng</h3>
+                                <p style="margin: 10px 0;"><strong>Họ và tên:</strong> ${HoTen}</p>
+                                <p style="margin: 10px 0;"><strong>Email:</strong> ${Email}</p>
+                                <p style="margin: 10px 0;"><strong>Điện thoại:</strong> ${SoDienThoai}</p>
+                            </div>
+
+                            <div style="background-color: #fffaf0; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #fde68a;">
+                                <h3 style="color: #92400e; margin-top: 0; border-bottom: 1px solid #fde68a; padding-bottom: 10px;">📦 Chi tiết đơn hàng #${MaDon}</h3>
+                                <p style="margin: 10px 0;"><strong>Tên Tour:</strong> ${TenTour}</p>
+                                <p style="margin: 10px 0;"><strong>Ngày khởi hành:</strong> ${new Date(NgayKhoiHanh).toLocaleDateString('vi-VN')}</p>
+                                <p style="margin: 10px 0;"><strong>Số lượng:</strong> ${SoKhach} người</p>
+                                <p style="margin: 10px 0; font-size: 18px; color: #dc2626;"><strong>Tổng tiền: ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ</strong></p>
+                                <p style="margin: 10px 0;"><strong>Phương thức:</strong> <b style="color: #1e3a8a;">${PhuongThucThanhToan === 'chuyen_khoan' ? 'Chuyển khoản' : 'Tiền mặt'}</b></p>
+                            </div>
+
+                            ${PhuongThucThanhToan === 'chuyen_khoan' ? `
+                                <div style="text-align: center; background-color: #f0fdf4; padding: 20px; border-radius: 12px; border: 1px solid #bbf7d0;">
+                                    <p style="margin-bottom: 15px; color: #166534; font-weight: bold;">Mã QR Khách đang dùng để chuyển khoản:</p>
+                                    <img src="${qrUrl}" alt="QR" style="width: 180px; height: 180px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+                                    <p style="margin-top: 10px; font-size: 13px; color: #166534;">ND: DULICHVIET ${MaDon} ${HoTen}</p>
+                                </div>
+                            ` : ''}
+
+                            <div style="text-align: center; margin-top: 30px;">
+                                <a href="https://dulichviet.click/admin/don-hang" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(30,58,138,0.2);">TRUY CẬP TRANG QUẢN TRỊ</a>
+                            </div>
                         </div>
 
-                        <div style="margin-top: 20px; padding: 15px; background-color: #fffaf0; border: 1px dashed #d97706; border-radius: 10px;">
-                            <h3 style="color: #d97706; margin-top: 0;">Thông tin Tour & Thanh toán</h3>
-                            <p style="margin: 8px 0;"><strong>Mã đơn hàng:</strong> #${MaDon}</p>
-                            <p style="margin: 8px 0;"><strong>Phương thức:</strong> ${PhuongThucThanhToan === 'chuyen_khoan' ? 'Chuyển khoản ngân hàng' : 'Thanh toán tiền mặt'}</p>
-                            <p style="margin: 8px 0; font-size: 20px; color: #dc2626;"><strong>Tổng tiền: ${new Intl.NumberFormat('vi-VN').format(TongTien)} VNĐ</strong></p>
-                        </div>
-
-                        <div style="text-align: center; margin-top: 30px;">
-                            <a href="https://website-tour-booking.vercel.app/admin/don-hang" style="background-color: #1a5f2e; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">VÀO TRANG QUẢN TRỊ XEM CHI TIẾT</a>
-                        </div>
-                        
-                        <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; font-size: 12px; color: #888; text-align: center;">
-                            <p>Đây là email thông báo tự động từ hệ thống Website Du Lịch Việt.</p>
-                            <p>© 2026 dulichviet.click . All rights reserved.</p>
+                        <div style="background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
+                            <p>© 2026 dulichviet.click - Hệ thống Tour Booking</p>
                         </div>
                     </div>
                 `
@@ -714,20 +740,14 @@ app.post('/api/dat-tour', async (req, res) => {
 // ==========================================
 app.put('/api/bookings/huy-don/:id', async (req, res) => {
     try {
-        const { id } = req.params; // Mã đơn hàng
-        const { lyDoHuy } = req.body; // Nhận lý do hủy từ Frontend gửi lên
+        const { id } = req.params;
+        const { lyDoHuy } = req.body;
         const pool = await connectDB();
 
-        // ===== BƯỚC 1: KIỂM TRA ĐƠN HÀNG =====
-        // Lấy đầy đủ thông tin đơn hàng + khách hàng + tour để gửi email
         const donHang = await pool.request()
             .input('MaDon', sql.Int, id)
             .query(`
-                SELECT 
-                    d.*, 
-                    n.HoTen, n.Email, n.SoDienThoai,
-                    t.TenTour, t.GiaGoc,
-                    l.NgayKhoiHanh
+                SELECT d.*, n.HoTen, n.Email, n.SoDienThoai, t.TenTour, l.NgayKhoiHanh
                 FROM DonDatTour d
                 JOIN NguoiDung n ON d.MaNguoiDung = n.MaNguoiDung
                 JOIN LichKhoiHanh l ON d.MaLich = l.MaLich
@@ -735,221 +755,54 @@ app.put('/api/bookings/huy-don/:id', async (req, res) => {
                 WHERE d.MaDon = @MaDon
             `);
 
-        if (donHang.recordset.length === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
-        }
-
+        if (donHang.recordset.length === 0) return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
         const don = donHang.recordset[0];
 
-        // Chỉ cho phép hủy nếu trạng thái vẫn là 'Chờ xử lý' hoặc 'Chờ thanh toán'
-        const allowCancelStatuses = ['Chờ xử lý', 'Chờ thanh toán'];
-        if (!allowCancelStatuses.includes(don.TrangThai)) {
-            return res.status(400).json({ message: 'Đơn này đã được xử lý hoặc đã hoàn tất, vui lòng liên hệ hotline 0354858892 để được hỗ trợ hủy!' });
+        if (don.TrangThai !== 'Chờ xử lý' && don.TrangThai !== 'Chờ thanh toán') {
+            return res.status(400).json({ message: 'Đơn này không thể hủy tự động, vui lòng liên hệ hotline 0354858892.' });
         }
 
-        // ===== BƯỚC 2: CẬP NHẬT TRẠNG THÁI THÀNH 'KHÁCH ĐÃ HỦY' =====
-        // [QUAN TRỌNG]: Lưu lý do hủy vào cột GhiChu để Admin xem lại được
-        const ghiChuStr = lyDoHuy ? `Lý do khách hủy: ${lyDoHuy}` : 'Khách tự hủy đơn trên hệ thống';
+        const ghiChuStr = lyDoHuy ? `Lý do khách hủy: ${lyDoHuy}` : 'Khách tự hủy đơn';
         await pool.request()
             .input('MaDon', sql.Int, id)
             .input('GhiChu', sql.NVarChar, ghiChuStr)
             .query("UPDATE DonDatTour SET TrangThai = N'Khách đã hủy', GhiChu = @GhiChu WHERE MaDon = @MaDon");
 
-        // ===== BƯỚC 3: HOÀN LẠI SỐ CHỖ NGỒI (SLOT) =====
         await pool.request()
             .input('MaLich', sql.Int, don.MaLich)
             .input('SoKhach', sql.Int, don.SoKhach)
             .query("UPDATE LichKhoiHanh SET SoChoDaDat = SoChoDaDat - @SoKhach WHERE MaLich = @MaLich");
 
-        // ===== BƯỚC 4: TÍNH SỐ TIỀN HOÀN LẠI ƯỚC TÍNH =====
-        // Quy tắc: Hủy càng sớm so với ngày khởi hành -> hoàn càng nhiều
-        const ngayDi = new Date(don.NgayKhoiHanh);
-        const now = new Date();
-        const soNgayConLai = Math.ceil((ngayDi - now) / (1000 * 60 * 60 * 24));
-
-        let phanTramHoan = 0;
-        let moTaHoan = '';
-        if (soNgayConLai >= 15) { phanTramHoan = 100; moTaHoan = 'Hoàn 100% (hủy trước 15 ngày)'; }
-        else if (soNgayConLai >= 7) { phanTramHoan = 70; moTaHoan = 'Hoàn 70% (hủy trước 7-14 ngày)'; }
-        else if (soNgayConLai >= 3) { phanTramHoan = 50; moTaHoan = 'Hoàn 50% (hủy trước 3-6 ngày)'; }
-        else if (soNgayConLai >= 1) { phanTramHoan = 20; moTaHoan = 'Hoàn 20% (hủy trước 1-2 ngày)'; }
-        else { phanTramHoan = 0; moTaHoan = 'Không hoàn tiền (hủy sát ngày khởi hành)'; }
-
-        const soTienHoan = don.TongTien * phanTramHoan / 100;
-
-        // ===== BƯỚC 5: GỬI EMAIL XÁC NHẬN HỦY TOUR =====
-        // [QUAN TRỌNG]: Gửi email thông báo hủy tour cho khách, bao gồm:
-        // - Tên tour đã hủy
-        // - Mã đơn hàng
-        // - Lý do hủy
-        // - Số tiền hoàn lại ước tính
-        // - Hotline liên hệ nếu có thắc mắc
         try {
-            const mailHuyTour = {
-                from: process.env.EMAIL_USER || '"Công Ty Du Lịch Việt" <tourbooking.dummy@gmail.com>',
-                to: don.Email, // Gửi đến email của khách hàng
-                subject: `Xác Nhận Hủy Tour #${id} - Du Lịch Việt`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #fecaca; border-radius: 12px; overflow: hidden;">
-                        
-                        <!-- HEADER - Tiêu đề email -->
-                        <div style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; padding: 24px; text-align: center;">
-                            <h2 style="margin: 0; font-size: 22px;">🚫 XÁC NHẬN HỦY TOUR</h2>
-                            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 14px;">Đơn hàng #${id} đã được hủy thành công</p>
-                        </div>
-
-                        <!-- NỘI DUNG CHÍNH -->
-                        <div style="padding: 24px;">
-                            <p style="color: #374151; font-size: 15px;">Xin chào <b>${don.HoTen}</b>,</p>
-                            <p style="color: #374151; font-size: 15px;">
-                                Chúng tôi xác nhận rằng đơn đặt tour của bạn đã được <b style="color: #dc2626;">hủy thành công</b>. 
-                                Dưới đây là thông tin chi tiết:
-                            </p>
-
-                            <!-- BẢNG THÔNG TIN ĐƠN HÀNG ĐÃ HỦY -->
-                            <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
-                                <tr style="background-color: #fef2f2;">
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold; width: 40%;">📋 Mã đơn hàng:</td>
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold; color: #dc2626;">#${id}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold;">🏖️ Tên tour:</td>
-                                    <td style="padding: 12px; border: 1px solid #fecaca;">${don.TenTour}</td>
-                                </tr>
-                                <tr style="background-color: #fef2f2;">
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold;">📅 Ngày khởi hành:</td>
-                                    <td style="padding: 12px; border: 1px solid #fecaca;">${new Date(don.NgayKhoiHanh).toLocaleDateString('vi-VN')}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold;">👥 Số khách:</td>
-                                    <td style="padding: 12px; border: 1px solid #fecaca;">${don.SoKhach} người</td>
-                                </tr>
-                                <tr style="background-color: #fef2f2;">
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold;">💰 Tổng tiền đã đặt:</td>
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold; color: #dc2626;">
-                                        ${new Intl.NumberFormat('vi-VN').format(don.TongTien)} VNĐ
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px; border: 1px solid #fecaca; font-weight: bold;">📝 Lý do hủy:</td>
-                                    <td style="padding: 12px; border: 1px solid #fecaca; color: #6b7280; font-style: italic;">
-                                        ${lyDoHuy || 'Không nêu lý do'}
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- THÔNG TIN HOÀN TIỀN (Phần quan trọng nhất) -->
-                            <div style="background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 2px solid #6ee7b7; border-radius: 10px; padding: 20px; margin: 20px 0;">
-                                <h3 style="color: #065f46; margin: 0 0 12px; font-size: 16px;">💵 Thông Tin Hoàn Tiền Ước Tính</h3>
-                                <table style="width: 100%; font-size: 14px;">
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #374151;">Mức hoàn tiền áp dụng:</td>
-                                        <td style="padding: 6px 0; font-weight: bold; color: #065f46; text-align: right;">${moTaHoan}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #374151;">Số tiền ước tính hoàn lại:</td>
-                                        <td style="padding: 6px 0; font-weight: bold; color: #059669; text-align: right; font-size: 20px;">
-                                            ${new Intl.NumberFormat('vi-VN').format(soTienHoan)} VNĐ
-                                        </td>
-                                    </tr>
-                                </table>
-                                <p style="color: #6b7280; font-size: 12px; margin: 10px 0 0; border-top: 1px solid #a7f3d0; padding-top: 10px;">
-                                    * Số tiền thực tế sẽ được bộ phận chăm sóc khách hàng xác nhận và chuyển khoản trong vòng <b>24 giờ</b> làm việc.
-                                </p>
-                            </div>
-
-                            <!-- BẢNG CHÍNH SÁCH HOÀN TIỀN THAM KHẢO -->
-                            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;">
-                                <h4 style="color: #475569; margin: 0 0 10px; font-size: 14px;">📊 Bảng Chính Sách Hoàn Tiền Tham Khảo:</h4>
-                                <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-                                    <tr style="background-color: #e2e8f0;">
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #cbd5e1;">Thời điểm hủy</th>
-                                        <th style="padding: 8px; text-align: center; border: 1px solid #cbd5e1;">% Hoàn lại</th>
-                                    </tr>
-                                    <tr><td style="padding: 6px 8px; border: 1px solid #e2e8f0;">Trước 15 ngày</td><td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #16a34a; font-weight: bold;">100%</td></tr>
-                                    <tr style="background-color: #f8fafc;"><td style="padding: 6px 8px; border: 1px solid #e2e8f0;">Trước 7-14 ngày</td><td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #2563eb; font-weight: bold;">70%</td></tr>
-                                    <tr><td style="padding: 6px 8px; border: 1px solid #e2e8f0;">Trước 3-6 ngày</td><td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #ca8a04; font-weight: bold;">50%</td></tr>
-                                    <tr style="background-color: #f8fafc;"><td style="padding: 6px 8px; border: 1px solid #e2e8f0;">Trước 1-2 ngày</td><td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #ea580c; font-weight: bold;">20%</td></tr>
-                                    <tr><td style="padding: 6px 8px; border: 1px solid #e2e8f0;">Ngày khởi hành</td><td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #dc2626; font-weight: bold;">0%</td></tr>
-                                </table>
-                            </div>
-
-                            <!-- HOTLINE HỖ TRỢ -->
-                            <div style="background-color: #eff6ff; border: 1px dashed #3b82f6; border-radius: 8px; padding: 16px; text-align: center; margin-top: 20px;">
-                                <p style="color: #1e40af; margin: 0; font-size: 14px;">
-                                    Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ ngay:
-                                </p>
-                                <p style="color: #1e40af; margin: 8px 0 0; font-size: 20px; font-weight: bold;">
-                                    📞 Hotline: 0354858892
-                                </p>
-                                <p style="color: #6b7280; margin: 8px 0 0; font-size: 12px;">
-                                    (Hỗ trợ 24/7 - Bao gồm cả ngày lễ)
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- FOOTER EMAIL -->
-                        <div style="background-color: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #e5e7eb;">
-                            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                                Đây là email tự động, vui lòng không trả lời email này.<br/>
-                                &copy; 2026 Công Ty Du Lịch Việt. Tất cả quyền được bảo lưu.
-                            </p>
-                        </div>
-                    </div>
-                `
-            };
-
-            transporter.sendMail(mailHuyTour, (error, info) => {
-                if (error) {
-                    console.log("⚠️ Gửi email hủy tour cho khách thất bại:", error.message);
-                } else {
-                    console.log("✅ Đã gửi email xác nhận hủy tour đến khách:", don.Email);
-                }
+            const adminEmail = 'phuochien847@gmail.com';
+            await resend.emails.send({
+                from: 'Du Lịch Việt <hotro@dulichviet.click>',
+                to: [don.Email],
+                subject: `🚫 XÁC NHẬN HỦY TOUR #${id} - DU LỊCH VIỆT`,
+                html: `<div style="font-family: Arial; max-width: 600px; margin: 0 auto; border: 1px solid #fca5a5; border-radius: 16px; overflow: hidden;">
+                        <div style="background: #dc2626; color: white; padding: 30px; text-align: center;"><h2>THÔNG BÁO HỦY TOUR</h2><p>Đơn hàng #${id} đã được hủy</p></div>
+                        <div style="padding: 25px;">
+                            <p>Chào <b>${don.HoTen}</b>, đơn hàng tour <b>${don.TenTour}</b> của bạn đã được hủy thành công. Lý do: ${lyDoHuy || 'Khách chủ động hủy'}. Số tiền hoàn lại (nếu có) sẽ được xử lý trong 24h.</p>
+                        </div></div>`
             });
 
-            // ===== BƯỚC 6: GỬI THÔNG BÁO CHO ADMIN PHƯỚC HIỀN =====
-            const mailNotifyAdmin = {
-                from: process.env.EMAIL_USER || '"Hệ Thống Thông Báo" <tourbooking.dummy@gmail.com>',
-                to: 'phuochien847@gmail.com', // Email của bạn
-                subject: `🚨 THÔNG BÁO: KHÁCH HÀNG HỦY TOUR #${id}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #f97316; border-radius: 10px;">
-                        <h2 style="color: #ea580c; margin-top: 0;">Khách Hàng Vừa Tự Hủy Đơn!</h2>
-                        <p>Chào Admin <b>Phước Hiền</b>,</p>
-                        <p>Hệ thống ghi nhận có một đơn đặt tour vừa được khách hàng tự hủy từ trang cá nhân.</p>
-                        <hr style="border: 0; border-top: 1px solid #fed7aa; margin: 20px 0;">
-                        <ul style="list-style: none; padding: 0;">
-                            <li><b>Mã đơn:</b> #${id}</li>
-                            <li><b>Khách hàng:</b> ${don.HoTen} (${don.SoDienThoai})</li>
-                            <li><b>Tour đặt:</b> ${don.TenTour}</li>
-                            <li><b>Lý do hủy:</b> ${lyDoHuy || 'Khách không nhập lý do'}</li>
-                            <li><b>Số tiền đã đặt:</b> ${new Intl.NumberFormat('vi-VN').format(don.TongTien)} VNĐ</li>
-                        </ul>
-                        <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">
-                            Vui lòng truy cập <a href="https://dulichviet.click/admin/don-hang" style="color: #2563eb; font-weight: bold;">Trang Quản Trị</a> để xem chi tiết và xử lý hoàn tiền nếu cần.
-                        </p>
-                    </div>
-                `
-            };
-
-            transporter.sendMail(mailNotifyAdmin, (err, info) => {
-                if (err) console.log("⚠️ Không thể gửi mail báo Admin:", err.message);
-                else console.log("✅ Đã gửi mail báo Admin Phước Hiền về việc hủy đơn.");
+            await resend.emails.send({
+                from: 'Hệ Thống Tour <hotro@dulichviet.click>',
+                to: [adminEmail],
+                subject: `🚨 CẢNH BÁO: KHÁCH HỦY TOUR #${id}`,
+                html: `<div style="font-family: Arial; border: 2px solid #ef4444; padding: 20px; border-radius: 12px;">
+                        <h3 style="color: #dc2626;">KHÁCH VỪA HỦY ĐƠN HÀNG!</h3>
+                        <p>🆔 Mã đơn: #${id}<br/>👤 Khách: ${don.HoTen} (${don.SoDienThoai})<br/>🌍 Tour: ${don.TenTour}<br/>❌ Lý do: ${lyDoHuy || 'Không có'}</p>
+                        <a href="https://dulichviet.click/admin/don-hang" style="background: #1e3a8a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">XỬ LÝ NGAY</a>
+                    </div>`
             });
+        } catch (mErr) { console.log("⚠️ Lỗi gửi mail hủy:", mErr.message); }
 
-        } catch (mailError) {
-            // Nếu lỗi email thì chỉ log ra console, KHÔNG dừng cả API
-            console.log("⚠️ Lỗi khi chuẩn bị email hủy tour:", mailError);
-        }
-
-        console.log(`🚫 Đơn #${id} đã bị hủy. Lý do: ${ghiChuStr}`);
-        res.json({ success: true, message: 'Đã hủy đơn thành công! Chúng tôi sẽ xử lý hoàn tiền trong vòng 24h.' });
-
+        res.json({ success: true, message: 'Đã hủy đơn thành công!' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 // ==========================================
 // API ADMIN (QUẢN TRỊ)
@@ -1005,6 +858,25 @@ app.put('/api/admin/bookings/:id', async (req, res) => {
             .query('UPDATE DonDatTour SET TrangThai = @TrangThai WHERE MaDon = @MaDon');
 
         res.json({ message: 'Cập nhật thành công', success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Lấy thông tin 1 người dùng (Profile)
+app.get('/api/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('Id', sql.Int, id)
+            .query('SELECT MaNguoiDung, HoTen, Email, SoDienThoai, DiaChi, AnhDaiDien, MaQuyen, TrangThai FROM NguoiDung WHERE MaNguoiDung = @Id');
+        
+        if (result.recordset.length > 0) {
+            res.json(result.recordset[0]);
+        } else {
+            res.status(404).json({ error: 'Không tìm thấy người dùng' });
+        }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
