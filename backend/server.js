@@ -518,7 +518,7 @@ app.post('/api/dat-tour', async (req, res) => {
                 JOIN LichKhoiHanh l ON d.MaLich = l.MaLich
                 JOIN Tour t ON l.MaTour = t.MaTour
                 WHERE d.MaNguoiDung = @MaNguoiDung 
-                AND d.TrangThai != N'Hủy'
+                AND d.TrangThai NOT IN (N'Hủy', N'Đã hủy', N'Khách đã hủy')
                 AND (
                     (@NgayS <= l.NgayVe AND @NgayE >= l.NgayKhoiHanh)
                 )
