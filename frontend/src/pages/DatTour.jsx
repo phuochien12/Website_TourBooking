@@ -18,7 +18,7 @@ function DatTour() {
     const [soDienThoai, setSoDienThoai] = useState(user ? user.SoDienThoai || '' : '');
     const [tinhThanh, setTinhThanh] = useState('Thành phố Cần Thơ');
     const [phuongXa, setPhuongXa] = useState('Phường Bình Thủy');
-    const [diaChi, setDiaChi] = useState('Việt Nam');
+    const [diaChi, setDiaChi] = useState(user?.DiaChi || 'Việt Nam');
     const [giaoHangKhac, setGiaoHangKhac] = useState(false);
     const [soKhach, setSoKhach] = useState(1);
     const [maLichChon, setMaLichChon] = useState('');

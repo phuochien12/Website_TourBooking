@@ -8,6 +8,7 @@ function HoSo() {
         HoTen: user?.HoTen || '',
         Email: user?.Email || '',
         SoDienThoai: user?.SoDienThoai || '',
+        DiaChi: user?.DiaChi || '',
         AnhDaiDien: user?.AnhDaiDien || '',
         MatKhauMoi: '',
         XacNhanMatKhau: ''
@@ -66,6 +67,7 @@ function HoSo() {
                 HoTen: formData.HoTen,
                 Email: formData.Email,
                 SoDienThoai: formData.SoDienThoai,
+                DiaChi: formData.DiaChi,
                 AnhDaiDien: formData.AnhDaiDien,
                 MatKhau: formData.MatKhauMoi || undefined
             });
@@ -77,6 +79,7 @@ function HoSo() {
                     HoTen: formData.HoTen, 
                     Email: formData.Email, 
                     SoDienThoai: formData.SoDienThoai,
+                    DiaChi: formData.DiaChi,
                     AnhDaiDien: formData.AnhDaiDien
                 };
                 localStorage.setItem('user', JSON.stringify(newUser));
@@ -193,6 +196,17 @@ function HoSo() {
                                             onChange={(e) => setFormData({ ...formData, SoDienThoai: e.target.value })}
                                         />
                                     </div>
+                                </div>
+
+                                <div>
+                                    <label className={labelStyle}>Địa chỉ hiện tại</label>
+                                    <input
+                                        type="text"
+                                        className={inputStyle}
+                                        placeholder="Nhập địa chỉ nhà, tên đường, quận/huyện..."
+                                        value={formData.DiaChi}
+                                        onChange={(e) => setFormData({ ...formData, DiaChi: e.target.value })}
+                                    />
                                 </div>
 
                                 <div>
