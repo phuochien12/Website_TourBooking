@@ -35,51 +35,52 @@ function LichKhoiHanhKhachHang() {
                 <div className="bg-white rounded-[24px] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead>
-                                <tr className="bg-navy text-white text-[11px] uppercase tracking-[2px] font-black">
-                                    <th className="px-6 py-5 text-center w-20">#</th>
-                                    <th className="px-6 py-5">Hành trình tham quan</th>
-                                    <th className="px-6 py-5 text-center">Thời lượng</th>
-                                    <th className="px-6 py-5 text-center">Tần suất</th>
-                                    <th className="px-6 py-5 text-center">Dịch vụ</th>
-                                    <th className="px-6 py-5 text-right pr-10">Giá từ</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50 uppercase font-bold text-[13px]">
-                                {tours.map((tour, index) => (
-                                    <tr key={tour.MaTour} className="group hover:bg-primary/5 transition-all duration-300 cursor-pointer">
-                                        <td className="px-6 py-5 text-center text-gray-400 group-hover:text-primary transition-colors">{index + 1}</td>
-                                        <td className="px-6 py-5">
-                                            <Link to={`/tour/${tour.MaTour}`} className="text-navy group-hover:text-primary transition-colors block">
-                                                {tour.TenTour}
-                                                <div className="text-[10px] text-gray-400 font-medium lowercase tracking-normal mt-1 flex items-center gap-2">
-                                                    <span className={`w-2 h-2 rounded-full ${tour.SoLich > 0 ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-orange-400'}`}></span>
-                                                    {tour.SoLich > 0 ? 'Đang mở bán trực tuyến' : 'Đang cập nhật lịch mới'}
-                                                </div>
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-5 text-center text-gray-500">{tour.ThoiGian || 'Chưa cập nhật'}</td>
-                                        <td className="px-6 py-4 text-center align-middle">
-                                            <span className={`px-4 py-1.5 rounded-full text-[11px] font-black whitespace-nowrap inline-block ${tour.SoLich > 0 ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-                                                {tour.SoLich > 0 ? 'Hằng ngày' : 'Sắp diễn ra'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-5 text-center text-[11px] text-gray-400 font-black">★★★☆☆</td>
-                                        <td className="px-6 py-4 text-right pr-10 align-middle whitespace-nowrap">
-                                            <div className="flex items-center justify-end gap-4">
-                                                <span className="text-red-600 text-[17px] font-black tracking-tighter">
-                                                    {new Intl.NumberFormat('vi-VN').format(tour.GiaGoc)}đ
-                                                </span>
-                                                {tour.SoLich > 0 ? (
-                                                    <Link to={`/dat-tour/${tour.MaTour}`} className="text-[11px] font-black text-white hover:bg-teal-700 transition-all bg-primary px-4 py-2 rounded-[8px]">Đặt chỗ ngay</Link>
-                                                ) : (
-                                                    <Link to="/lien-he" className="text-[11px] font-black text-gray-500 hover:bg-gray-200 transition-all bg-gray-100 px-4 py-2 rounded-[8px]">Liên hệ tư vấn</Link>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
+                                    <thead>
+                                        <tr className="bg-navy text-white text-[11px] uppercase tracking-[2px] font-black">
+                                            <th className="px-6 py-5 text-center w-20">#</th>
+                                            <th className="px-6 py-5">Hành trình tham quan</th>
+                                            <th className="px-6 py-5 text-center">Thời lượng</th>
+                                            <th className="px-6 py-5 text-center">Tần suất</th>
+                                            <th className="px-6 py-5 text-center">Dịch vụ</th>
+                                            <th className="px-6 py-5 text-right w-32">Giá từ</th>
+                                            <th className="px-6 py-5 w-40"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50 uppercase font-bold text-[13px]">
+                                        {tours.map((tour, index) => (
+                                            <tr key={tour.MaTour} className="group hover:bg-primary/5 transition-all duration-300 cursor-pointer">
+                                                <td className="px-6 py-5 text-center text-gray-400 group-hover:text-primary transition-colors">{index + 1}</td>
+                                                <td className="px-6 py-5">
+                                                    <Link to={`/tour/${tour.MaTour}`} className="text-navy group-hover:text-primary transition-colors block">
+                                                        {tour.TenTour}
+                                                        <div className="text-[10px] text-gray-400 font-medium lowercase tracking-normal mt-1 flex items-center gap-2">
+                                                            <span className={`w-2 h-2 rounded-full ${tour.SoLich > 0 ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-orange-400'}`}></span>
+                                                            {tour.SoLich > 0 ? 'Đang mở bán trực tuyến' : 'Đang cập nhật lịch mới'}
+                                                        </div>
+                                                    </Link>
+                                                </td>
+                                                <td className="px-6 py-5 text-center text-gray-500">{tour.ThoiGian || 'Chưa cập nhật'}</td>
+                                                <td className="px-6 py-5 text-center align-middle">
+                                                    <span className={`px-4 py-1.5 rounded-full text-[11px] font-black whitespace-nowrap inline-block ${tour.SoLich > 0 ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                                                        {tour.SoLich > 0 ? 'Hằng ngày' : 'Sắp diễn ra'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-5 text-center text-[11px] text-gray-400 font-black">★★★☆☆</td>
+                                                <td className="px-6 py-5 text-right align-middle">
+                                                    <span className="text-red-600 text-[17px] font-black tracking-tighter">
+                                                        {new Intl.NumberFormat('vi-VN').format(tour.GiaGoc)}đ
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-5 text-left align-middle">
+                                                    {tour.SoLich > 0 ? (
+                                                        <Link to={`/dat-tour/${tour.MaTour}`} className="text-[11px] font-black text-white hover:bg-teal-700 transition-all bg-primary px-4 py-2 rounded-[8px] whitespace-nowrap">Đặt chỗ ngay</Link>
+                                                    ) : (
+                                                        <Link to="/lien-he" className="text-[11px] font-black text-gray-500 hover:bg-gray-200 transition-all bg-gray-100 px-4 py-2 rounded-[8px] whitespace-nowrap">Liên hệ tư vấn</Link>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
                         </table>
                     </div>
                 </div>
