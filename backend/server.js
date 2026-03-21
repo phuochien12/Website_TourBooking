@@ -794,7 +794,7 @@ app.get('/api/admin/bookings', async (req, res) => {
         const pool = await connectDB();
         
         let queryStr = `
-            SELECT d.MaDon, d.NgayDat, d.SoKhach, d.TongTien, d.TrangThai, 
+            SELECT d.MaDon, d.NgayDat, d.SoKhach, d.TongTien, d.TrangThai, d.GhiChu, 
                    n.HoTen, n.Email, n.SoDienThoai, 
                    t.TenTour, l.NgayKhoiHanh 
             FROM DonDatTour d 

@@ -181,6 +181,13 @@ function QuanLyDonHang() {
                                             <td className="p-4">
                                                 <p className="font-black text-sm text-slate-200 group-hover:text-white transition-all uppercase">{item.HoTen}</p>
                                                 <p className="text-xs text-slate-500 font-medium mt-0.5">{item.SoDienThoai}</p>
+                                                {item.GhiChu && (
+                                                    <div className="mt-2 p-2 bg-slate-800/80 border border-slate-700/50 rounded-xl max-w-[200px] shadow-inner">
+                                                        <p className="text-[10px] text-slate-400 font-semibold italic leading-snug normal-case">
+                                                            <span className="text-blue-400 not-italic mr-1">📝</span> {item.GhiChu}
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </td>
                                             <td className="p-4 max-w-xs" title={item.TenTour}>
                                                 <span className="text-sm font-bold text-slate-300 line-clamp-2 leading-relaxed">{item.TenTour}</span>
