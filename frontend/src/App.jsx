@@ -526,7 +526,7 @@ function App() {
                 </div>
 
                 <div className="border-t border-white/10 mt-16 pt-8 text-center text-xs text-gray-400">
-                    <p>© 2026 <strong className="text-[#c9a96e]">Huỳnh Phước Hiền</strong>. Thiết kế bởi Sinh Viên CS2.</p>
+                    <p>@2026 <strong className="text-[#c9a96e]">dulichviet.click</strong>. Thiết kế bởi Huỳnh Phước Hiền</p>
                 </div>
             </footer>
             
