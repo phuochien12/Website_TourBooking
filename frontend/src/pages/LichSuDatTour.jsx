@@ -138,9 +138,14 @@ function LichSuDatTour() {
                                             </p>
                                             <p className="text-gray-600 text-sm">👥 Số khách: {item.SoKhach}</p>
                                             <p className="text-gray-600 text-sm">🕒 Ngày đặt: {new Date(item.NgayDat).toLocaleDateString('vi-VN')}</p>
-                                            {/* [MỚI] Hiển thị lý do hủy nếu đơn đã bị hủy */}
-                                            {(item.TrangThai === 'Đã hủy' || item.TrangThai === 'Khách đã hủy') && item.GhiChu && (
-                                                <p className="text-red-500 text-sm mt-1 italic">💬 {item.GhiChu}</p>
+                                            {/* [MỚI] Hiển thị lý do hủy nếu đơn đã bị hủy (Khách hủy hoặc BTC hủy) */}
+                                            {(item.TrangThai === 'Đã hủy' || item.TrangThai === 'Khách đã hủy' || item.TrangThai === 'Hủy bởi BTC' || item.TrangThai === 'Hủy') && item.GhiChu && (
+                                                <div className={`mt-3 p-3 rounded-lg text-sm italic border-l-4 ${item.TrangThai === 'Khách đã hủy' ? 'bg-red-50 border-red-500 text-red-700' : 'bg-orange-50 border-orange-500 text-orange-700'}`}>
+                                                    <p className="font-bold mb-1">
+                                                        {item.TrangThai === 'Khách đã hủy' ? '📍 Lý do của bạn:' : '📢 Thông báo từ Ban Tổ Chức:'}
+                                                    </p>
+                                                    {item.GhiChu}
+                                                </div>
                                             )}
                                         </div>
                                         <div className="text-right">
@@ -149,13 +154,14 @@ function LichSuDatTour() {
                                             </p>
                                             <div className="flex flex-col items-end gap-2">
                                                 <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold shadow-sm whitespace-nowrap transition-all duration-300
-                                                    ${new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy' && item.TrangThai !== 'Hủy') ? 'bg-gray-500 text-white' :
-                                                        item.TrangThai === 'Đã thanh toán' || item.TrangThai === 'Đã xác nhận' ? 'bg-green-100 text-green-700' :
-                                                            (item.TrangThai === 'Đã hủy' || item.TrangThai === 'Khách đã hủy' || item.TrangThai === 'Hủy') ? 'bg-red-600 text-white shadow-red-200' :
-                                                                item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                                                                    'bg-orange-100 text-orange-700'}`}>
-                                                    {new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy' && item.TrangThai !== 'Hủy') ? 'Đã kết thúc' : 
-                                                     (item.TrangThai === 'Hủy' ? 'Đã hủy' : item.TrangThai)}
+                                                     ${new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy' && item.TrangThai !== 'Hủy bởi BTC') ? 'bg-gray-500 text-white' :
+                                                         item.TrangThai === 'Đã thanh toán' || item.TrangThai === 'Đã xác nhận' ? 'bg-green-100 text-green-700' :
+                                                             (item.TrangThai === 'Đã hủy' || item.TrangThai === 'Khách đã hủy' || item.TrangThai === 'Hủy') ? 'bg-red-600 text-white shadow-red-200' :
+                                                                 item.TrangThai === 'Hủy bởi BTC' ? 'bg-orange-600 text-white shadow-orange-200' :
+                                                                     item.TrangThai === 'Chờ thanh toán' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                                                                         'bg-orange-100 text-orange-700'}`}>
+                                                    {new Date(item.NgayKhoiHanh) < new Date() && (item.TrangThai !== 'Đã hủy' && item.TrangThai !== 'Khách đã hủy' && item.TrangThai !== 'Hủy bởi BTC') ? 'Đã kết thúc' : 
+                                                     item.TrangThai}
                                                 </span>
 
                                                 {/* ===== NÚT HỦY ĐƠN (Cho phép hủy khi chưa thanh toán hoặc đang chờ xử lý) ===== */}

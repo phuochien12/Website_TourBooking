@@ -1395,17 +1395,18 @@ app.put('/api/admin/schedules/cancel/:id', async (req, res) => {
                 WHERE d.MaLich = @MaLich AND d.TrangThai != N'Hủy'
             `);
 
-        // 3. Cập nhật trạng thái Lịch thành 'Hủy'
+        // 3. Cập nhật trạng thái Lịch thành 'Hủy bởi BTC'
         await pool.request()
             .input('MaLich', sql.Int, id)
-            .query("UPDATE LichKhoiHanh SET TrangThai = N'Đã hủy' WHERE MaLich = @MaLich");
+            .query("UPDATE LichKhoiHanh SET TrangThai = N'Hủy bởi BTC' WHERE MaLich = @MaLich");
 
-        // 4. Cập nhật tất cả các đơn hàng liên quan
-        const ghiChuMoi = `Hủy bởi Admin - Lý do: ${lyDoHuy || 'Sự cố bất khả kháng'}`;
+        // 4. Cập nhật tất cả các đơn hàng liên quan với lý do chuyên nghiệp
+        const lyDoChuyenNghiep = lyDoHuy || 'Sự cố bất khả kháng (Thời tiết/Kỹ thuật) - Chúng tôi sẽ hoàn tiền 100% cho quý khách.';
+        const ghiChuMoi = `Hủy bởi BTC - Lý do: ${lyDoChuyenNghiep}`;
         await pool.request()
             .input('MaLich', sql.Int, id)
             .input('GhiChu', sql.NVarChar, ghiChuMoi)
-            .query("UPDATE DonDatTour SET TrangThai = N'Đã hủy', GhiChu = @GhiChu WHERE MaLich = @MaLich AND TrangThai != N'Hủy'");
+            .query("UPDATE DonDatTour SET TrangThai = N'Hủy bởi BTC', GhiChu = @GhiChu WHERE MaLich = @MaLich AND TrangThai NOT IN (N'Khách đã hủy', N'Hủy')");
 
         // 5. Gửi email thông báo cho từng khách
         for (const khách of dskhach.recordset) {
