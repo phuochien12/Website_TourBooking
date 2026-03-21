@@ -1326,18 +1326,39 @@ app.delete('/api/admin/schedules/:id', async (req, res) => {
         const { id } = req.params;
         const pool = await connectDB();
 
-        // Kiểm tra xem đã có ai đặt chưa before delete
-        const check = await pool.request().input('MaLich', sql.Int, id)
+        // 1. Kiểm tra lồng thêm: Xem có bản ghi nào trong DonDatTour tham chiếu tới MaLich này không
+        // (Kể cả khi SoChoDaDat = 0, vẫn có thể có đơn đã hủy nằm trong DB gây lỗi khóa ngoại)
+        const checkBooking = await pool.request()
+            .input('MaLich', sql.Int, id)
+            .query('SELECT COUNT(*) as Count FROM DonDatTour WHERE MaLich = @MaLich');
+        
+        if (checkBooking.recordset[0].Count > 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Không thể xóa lịch này vì đã từng có ${checkBooking.recordset[0].Count} lượt đặt chỗ (có thể bao gồm đơn đã hủy). Hãy sử dụng tính năng 'Hủy lịch' để ẩn lịch này đi.` 
+            });
+        }
+
+        // 2. Kiểm tra xem đã có ai đặt chưa (dựa trên slot - check thêm cho chắc)
+        const checkSlot = await pool.request().input('MaLich', sql.Int, id)
             .query('SELECT SoChoDaDat FROM LichKhoiHanh WHERE MaLich = @MaLich');
 
-        if (check.recordset[0] && check.recordset[0].SoChoDaDat > 0) {
-            return res.status(400).json({ message: 'Không thể xóa lịch này vì đã có khách đặt! Hãy sử dụng tính năng HỦY LỊCH.' });
+        if (checkSlot.recordset[0] && checkSlot.recordset[0].SoChoDaDat > 0) {
+            return res.status(400).json({ success: false, message: 'Không thể xóa lịch này vì đang có khách đặt chỗ! Hãy sử dụng tính năng HỦY LỊCH.' });
         }
 
         await pool.request().input('MaLich', sql.Int, id).query('DELETE FROM LichKhoiHanh WHERE MaLich = @MaLich');
         res.json({ success: true, message: 'Đã xóa lịch thành công!' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("❌ Lỗi xóa lịch:", err.message);
+        // Bắt lỗi khóa ngoại nếu check ở trên bị sót
+        if (err.message.includes('REFERENCE') || err.message.includes('FOREIGN KEY')) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Không thể xóa lịch này do vi phạm ràng buộc dữ liệu (có lịch sử đặt tour liên quan).' 
+            });
+        }
+        res.status(500).json({ error: 'Lỗi server', details: err.message });
     }
 });
 
