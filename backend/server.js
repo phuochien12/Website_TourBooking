@@ -828,13 +828,14 @@ app.get('/api/admin/bookings', async (req, res) => {
 app.put('/api/admin/bookings/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const status = req.body.status;
+        const { status, ghiChu } = req.body;
         const pool = await connectDB();
 
         await pool.request()
             .input('MaDon', sql.Int, id)
             .input('TrangThai', sql.NVarChar, status)
-            .query('UPDATE DonDatTour SET TrangThai = @TrangThai WHERE MaDon = @MaDon');
+            .input('GhiChu', sql.NVarChar, ghiChu || null)
+            .query('UPDATE DonDatTour SET TrangThai = @TrangThai, GhiChu = @GhiChu WHERE MaDon = @MaDon');
 
         res.json({ message: 'Cập nhật thành công', success: true });
     } catch (err) {
