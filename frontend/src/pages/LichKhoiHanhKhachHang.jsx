@@ -65,15 +65,15 @@ function LichKhoiHanhKhachHang() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-5 text-center text-[11px] text-gray-400 font-black">★★★☆☆</td>
-                                        <td className="px-6 py-4 text-right pr-10 align-middle">
-                                            <div className="flex flex-col items-end gap-1">
-                                                <span className="text-red-600 text-[17px] font-black tracking-tighter whitespace-nowrap">
+                                        <td className="px-6 py-4 text-right pr-10 align-middle whitespace-nowrap">
+                                            <div className="flex items-center justify-end gap-4">
+                                                <span className="text-red-600 text-[17px] font-black tracking-tighter">
                                                     {new Intl.NumberFormat('vi-VN').format(tour.GiaGoc)}đ
                                                 </span>
                                                 {tour.SoLich > 0 ? (
-                                                    <Link to={`/dat-tour/${tour.MaTour}`} className="text-[11px] font-black text-primary hover:bg-primary hover:text-white transition-all bg-primary/10 px-3 py-1.5 rounded-[8px] whitespace-nowrap">Đặt chỗ ngay</Link>
+                                                    <Link to={`/dat-tour/${tour.MaTour}`} className="text-[11px] font-black text-white hover:bg-teal-700 transition-all bg-primary px-4 py-2 rounded-[8px]">Đặt chỗ ngay</Link>
                                                 ) : (
-                                                    <Link to="/lien-he" className="text-[11px] font-black text-gray-500 hover:bg-gray-200 transition-all bg-gray-100 px-3 py-1.5 rounded-[8px] whitespace-nowrap">Liên hệ tư vấn</Link>
+                                                    <Link to="/lien-he" className="text-[11px] font-black text-gray-500 hover:bg-gray-200 transition-all bg-gray-100 px-4 py-2 rounded-[8px]">Liên hệ tư vấn</Link>
                                                 )}
                                             </div>
                                         </td>
