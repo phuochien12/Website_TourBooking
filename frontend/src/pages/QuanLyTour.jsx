@@ -108,27 +108,31 @@ function QuanLyTour() {
 
     // [MỚI] Hủy lịch khởi hành do sự cố (Admin)
     const handleCancelSchedule = async (sch) => {
+        const hasBookings = sch.SoChoDaDat > 0;
         const { value: reason } = await Swal.fire({
-            title: 'Hủy lịch & Hoàn tiền?',
-            html: `Bạn đang thực hiện hủy toàn bộ chuyến đi ngày <b>${new Date(sch.NgayKhoiHanh).toLocaleDateString('vi-VN')}</b>.<br/>Hệ thống sẽ tự động hủy đơn và gửi email thông báo hoàn tiền 100% cho <b>${sch.SoChoDaDat} khách hàng</b>.`,
+            title: hasBookings ? 'Hủy lịch & Hoàn tiền?' : 'Xác nhận Hủy lịch?',
+            html: hasBookings 
+                ? `Bạn đang thực hiện hủy toàn bộ chuyến đi ngày <b>${new Date(sch.NgayKhoiHanh).toLocaleDateString('vi-VN')}</b>.<br/>Hệ thống sẽ tự động hủy đơn và gửi email thông báo hoàn tiền 100% cho <b>${sch.SoChoDaDat} khách hàng</b>.`
+                : `Lịch ngày <b>${new Date(sch.NgayKhoiHanh).toLocaleDateString('vi-VN')}</b> sẽ được chuyển sang trạng thái <b>Đã hủy</b> và không còn hiển thị cho khách hàng.`,
             icon: 'warning',
             input: 'text',
-            inputLabel: 'Lý do hủy (Sẽ gửi trong email cho khách)',
+            inputLabel: 'Lý do hủy (Sẽ gửi trong email cho khách nếu có)',
             inputPlaceholder: 'VD: Do bão đổ bộ tại điểm đến...',
             showCancelButton: true,
-            confirmButtonColor: '#dc2626',
+            confirmButtonColor: '#f97316',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Xác nhận Hủy & Hoàn tiền',
+            confirmButtonText: hasBookings ? 'Xác nhận Hủy & Hoàn tiền' : 'Xác nhận Hủy Lịch',
             cancelButtonText: 'Quay lại',
             inputValidator: (value) => {
-                if (!value) return 'Bạn cần nhập lý do để khách hàng thông cảm!';
+                if (hasBookings && !value) return 'Bạn cần nhập lý do để khách hàng thông cảm!';
             }
         });
 
-        if (reason) {
+        if (reason !== undefined) {
+             // can be empty string if hasBookings is false, that's fine
             Swal.fire({ title: 'Đang xử lý...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            axios.put(`/api/admin/schedules/cancel/${sch.MaLich}`, { lyDoHuy: reason })
+            axios.put(`/api/admin/schedules/cancel/${sch.MaLich}`, { lyDoHuy: reason || "Admin chủ động hủy" })
                 .then(res => {
                     Swal.fire('Thành công!', res.data.message, 'success');
                     // Reload lại list lịch
@@ -512,23 +516,26 @@ function QuanLyTour() {
                                                             </td>
                                                             <td className="p-2">{sch.SoChoDaDat} / {sch.SoChoToiDa}</td>
                                                             <td className="p-2">
-                                                                {sch.TrangThai === 'Hủy' ? (
+                                                                {sch.TrangThai === 'Đã hủy' || sch.TrangThai === 'Hủy' ? (
                                                                     <span className="text-red-600 font-bold bg-red-50 px-2 py-1 rounded text-xs">ĐÃ HỦY</span>
                                                                 ) : new Date(sch.NgayKhoiHanh) < new Date().setHours(0,0,0,0) ? (
                                                                     <div className="flex flex-col items-center gap-1">
                                                                         <span className="text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded text-[10px] uppercase">Đã kết thúc</span>
                                                                         <button onClick={() => handleDeleteSchedule(sch.MaLich)} className="text-xs text-red-400 hover:text-red-600 underline">Xóa lịch cũ</button>
                                                                     </div>
-                                                                ) : sch.SoChoDaDat === 0 ? (
-                                                                    <button onClick={() => handleDeleteSchedule(sch.MaLich)} className="text-red-500 hover:underline">Xóa</button>
                                                                 ) : (
-                                                                    <button 
-                                                                        onClick={() => handleCancelSchedule(sch)}
-                                                                        className="bg-red-500 text-white px-2 py-1 rounded text-[10px] font-bold hover:bg-red-600 transition shadow-sm"
-                                                                        title="Hủy cả đoàn và hoàn tiền"
-                                                                    >
-                                                                        HỦY & HOÀN TIỀN
-                                                                    </button>
+                                                                    <div className="flex flex-col gap-1 items-center">
+                                                                        {sch.SoChoDaDat === 0 ? (
+                                                                            <button onClick={() => handleDeleteSchedule(sch.MaLich)} className="text-red-500 hover:underline text-sm font-semibold mb-1">Xóa hẳn</button>
+                                                                        ) : null}
+                                                                        <button 
+                                                                            onClick={() => handleCancelSchedule(sch)}
+                                                                            className="bg-orange-500 text-white px-2 py-1 rounded text-[10px] font-bold hover:bg-orange-600 transition shadow-sm w-full"
+                                                                            title="Hủy lịch này để ẩn khỏi trang chủ"
+                                                                        >
+                                                                            {sch.SoChoDaDat > 0 ? 'HỦY & HOÀN TIỀN' : 'HỦY LỊCH'}
+                                                                        </button>
+                                                                    </div>
                                                                 )}
                                                             </td>
                                                         </tr>
