@@ -648,8 +648,8 @@ function QuanLyTour() {
                         </div>
                     )}
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
 
