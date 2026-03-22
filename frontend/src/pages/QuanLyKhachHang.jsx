@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Swal from 'sweetalert2'; // [ĐỒNG BỘ] Popup đẹp cho Admin
+import Swal from 'sweetalert2'; 
+import { HiLockClosed, HiLockOpen, HiTrash, HiCursorClick } from 'react-icons/hi';
 
 function QuanLyKhachHang() {
     const [danhSachKhachHang, setDanhSachKhachHang] = useState([]);
@@ -95,7 +96,7 @@ function QuanLyKhachHang() {
         setEditForm({ HoTen: user.HoTen, Email: user.Email, SoDienThoai: user.SoDienThoai });
     };
 
-    const handleSaveEdit = async (e) => {
+    const handleUpdate = async (e) => {
         e.preventDefault();
 
         // Validate SĐT
@@ -145,202 +146,234 @@ function QuanLyKhachHang() {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
     const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    if (dangTai) return <div className="text-center py-20 flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-600"></div></div>;
+    if (dangTai) return (
+        <div className="bg-[#0f172a] min-h-screen flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+                <p className="text-slate-500 font-black tracking-widest uppercase animate-pulse text-[10px] text-center">ĐANG TRUY XUẤT HỆ THỐNG KHÁCH HÀNG...</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="bg-gray-50 min-h-screen py-10 relative">
-            <div className="container mx-auto px-4 max-w-7xl">
-                <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg border-t-4 border-[#003c71]">
+        <div className="bg-[#0f172a] min-h-screen p-4 md:p-8 font-sans text-slate-200">
+            <div className="container mx-auto">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-2 h-10 bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]"></div>
+                        <h1 className="text-3xl font-black tracking-tight text-white uppercase italic">
+                            Quản Lý <span className="text-indigo-400 font-bold">Khách Hàng</span>
+                        </h1>
+                    </div>
+                    <div className="relative w-full md:w-96 group">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors">🔍</span>
+                        <input
+                            type="text"
+                            placeholder="Tìm tên, email hoặc SĐT..."
+                            className="w-full bg-slate-900 border-slate-700 border pl-12 pr-4 py-3.5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold group-hover:border-slate-600 shadow-inner"
+                            value={searchKeyword}
+                            onChange={(e) => { setSearchKeyword(e.target.value); setCurrentPage(1); }}
+                        />
+                    </div>
+                </div>
 
-                    {/* Header Table */}
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                        <h2 className="text-2xl font-bold text-[#003c71] uppercase tracking-wider flex items-center gap-2">
-                            <span>📇</span> QUẢN LÝ KHÁCH HÀNG
-                        </h2>
-
-                        {/* Bộ Lọc (Filters) */}
-                        <div className="flex flex-wrap gap-3">
-                            <input
-                                type="text" placeholder="Tìm tên, email, SDT..."
-                                className="border px-3 py-2 rounded focus:ring-1 focus:ring-blue-500 text-sm outline-none"
-                                value={searchKeyword} onChange={e => { setSearchKeyword(e.target.value); setCurrentPage(1); }}
-                            />
-                            <select
-                                className="border px-3 py-2 rounded text-sm bg-gray-50 outline-none hover:bg-white focus:ring-1 focus:ring-blue-500"
-                                value={filterRole} onChange={e => { setFilterRole(e.target.value); setCurrentPage(1); }}
-                            >
-                                <option value="all">- Tất cả Vai trò -</option>
-                                <option value="admin">Quản trị viên</option>
-                                <option value="customer">Khách hàng</option>
-                            </select>
-                            <select
-                                className="border px-3 py-2 rounded text-sm bg-gray-50 outline-none hover:bg-white focus:ring-1 focus:ring-blue-500"
-                                value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setCurrentPage(1); }}
-                            >
-                                <option value="all">- Tất cả Trạng thái -</option>
-                                <option value="active">Đang hoạt động</option>
-                                <option value="locked">Đã khóa</option>
-                            </select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-[#1e293b] p-6 rounded-3xl border border-slate-700/50 shadow-xl">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Phân quyền người dùng</label>
+                        <select
+                            className="w-full bg-slate-900 border-slate-700 border p-3.5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold"
+                            value={filterRole}
+                            onChange={(e) => { setFilterRole(e.target.value); setCurrentPage(1); }}
+                        >
+                            <option value="all">Tất cả vai trò</option>
+                            <option value="admin">Quản trị viên</option>
+                            <option value="customer">Khách hàng</option>
+                        </select>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Trạng thái tài khoản</label>
+                        <div className="flex bg-slate-900 rounded-2xl p-1 border border-slate-700">
+                            {[
+                                { id: 'all', label: 'Tất cả' },
+                                { id: 'active', label: 'Hoạt động' },
+                                { id: 'locked', label: 'Đã khóa' }
+                            ].map((status) => (
+                                <button
+                                    key={status.id}
+                                    onClick={() => { setFilterStatus(status.id); setCurrentPage(1); }}
+                                    className={`flex-1 py-2.5 px-4 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${filterStatus === status.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/20' : 'text-slate-500 hover:text-slate-300'}`}
+                                >
+                                    {status.label}
+                                </button>
+                            ))}
                         </div>
                     </div>
+                </div>
 
-                    {/* Table Data */}
-                    <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                        <table className="w-full text-left border-collapse bg-white">
+                <div className="bg-[#1e293b] rounded-[2rem] shadow-2xl overflow-hidden border border-slate-700/50">
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
                             <thead>
-                                <tr className="bg-[#f8fadc] text-[#003c71] border-b-2 border-gray-200">
-                                    <th className="p-4 font-bold w-16 text-center">ID</th>
-                                    <th className="p-4 font-bold text-left">Khách Hàng</th>
-                                    <th className="p-4 font-bold text-left">Email</th>
-                                    <th className="p-4 font-bold text-center">Số Điện Thoại</th>
-                                    <th className="p-4 font-bold text-center">Vai Trò</th>
-                                    <th className="p-4 font-bold text-center">Trạng Thái</th>
-                                    <th className="p-4 font-bold text-center w-36">Thao tác</th>
+                                <tr className="bg-slate-800/80 text-left text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-700">
+                                    <th className="p-6">Thông tin tài khoản</th>
+                                    <th className="p-6">Email / Liên hệ</th>
+                                    <th className="p-6 text-center">Vai trò</th>
+                                    <th className="p-6 text-center">Trạng thái</th>
+                                    <th className="p-6 text-center">Quản trị</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {currentData.length > 0 ? currentData.map((user) => (
-                                    <tr key={user.MaNguoiDung} className="border-b hover:bg-blue-50 transition-colors duration-150">
-                                        <td className="p-4 font-bold text-gray-500 text-center">#{user.MaNguoiDung}</td>
-
-                                        <td className="p-4 text-gray-800 font-bold capitalize">
-                                            {/* Sửa text-transform: capitalize giúp tên luôn đẹp */}
-                                            {user.HoTen}
-                                        </td>
-
-                                        <td className="p-4 text-gray-600 text-left">{user.Email}</td>
-
-                                        <td className="p-4 text-gray-800 font-semibold text-center">
-                                            {user.SoDienThoai || <span className="text-red-400 italic font-normal text-xs">Chưa cập nhật</span>}
-                                        </td>
-
-                                        <td className="p-4 text-center">
-                                            {user.MaQuyen === 1 ? (
-                                                <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border border-purple-200">Quản trị viên</span>
-                                            ) : (
-                                                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs whitespace-nowrap border border-gray-200">Khách hàng</span>
-                                            )}
-                                        </td>
-
-                                        <td className="p-4 text-center">
-                                            {(user.TrangThai === 1 || user.TrangThai === true) ? (
-                                                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border border-green-200">Hoạt động</span>
-                                            ) : (
-                                                <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border border-red-200">Đã khóa</span>
-                                            )}
-                                        </td>
-
-                                        {/* Cột Thao tác */}
-                                        <td className="p-4 text-center">
-                                            <div className="flex justify-center items-center gap-2">
-                                                {/* Edit Button */}
-                                                <button onClick={() => openEditModal(user)} className="p-1.5 bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-600 rounded transition shadow-sm" title="Sửa thông tin">
-                                                    ✏️
-                                                </button>
-
-                                                {/* Toggle Lock Button */}
-                                                <button
-                                                    onClick={() => handleToggleLock(user.MaNguoiDung, user.TrangThai)}
-                                                    className={`p-1.5 rounded transition shadow-sm font-bold ${(user.TrangThai === 1 || user.TrangThai === true) ? 'bg-orange-100 hover:bg-orange-500 hover:text-white text-orange-600' : 'bg-green-100 hover:bg-green-600 hover:text-white text-green-600'}`}
-                                                    title={(user.TrangThai === 1 || user.TrangThai === true) ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                                                >
-                                                    {(user.TrangThai === 1 || user.TrangThai === true) ? '🔒' : '🔓'}
-                                                </button>
-
-                                                {/* Delete Button */}
-                                                <button onClick={() => handleDeleteUser(user.MaNguoiDung)} className="p-1.5 bg-red-100 hover:bg-red-600 hover:text-white text-red-600 rounded transition shadow-sm" title="Xóa tài khoản">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )) : (
-                                    <tr>
-                                        <td colSpan="7" className="text-center p-12 text-gray-500 text-lg">
-                                            ❌ Không có dữ liệu khách hàng nào khớp với yêu cầu tìm kiếm!
-                                        </td>
-                                    </tr>
+                            <tbody className="divide-y divide-slate-700/50">
+                                {currentData.length > 0 ? (
+                                    currentData.map((user) => (
+                                        <tr key={user.MaNguoiDung} className="hover:bg-indigo-500/5 transition-all duration-300 group">
+                                            <td className="p-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400 font-black text-lg border border-indigo-500/30 group-hover:scale-110 transition-transform">
+                                                        {user.HoTen ? user.HoTen.charAt(0).toUpperCase() : '?'}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-black text-white group-hover:text-indigo-400 transition-colors uppercase italic tracking-tighter">{user.HoTen}</h4>
+                                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">ID: KH-{user.MaNguoiDung.toString().padStart(4, '0')}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-6">
+                                                <div className="space-y-1">
+                                                    <p className="text-sm font-bold text-slate-300">📧 {user.Email}</p>
+                                                    <p className="text-xs font-semibold text-slate-500 tracking-wide">📞 {user.SoDienThoai || 'Chưa cập nhật'}</p>
+                                                </div>
+                                            </td>
+                                            <td className="p-6 text-center">
+                                                {user.MaQuyen === 1 ? (
+                                                    <span className="bg-purple-500/10 text-purple-500 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase border border-purple-500/20">Admin</span>
+                                                ) : (
+                                                    <span className="bg-slate-700/50 text-slate-400 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase border border-slate-600/30">User</span>
+                                                )}
+                                            </td>
+                                            <td className="p-6 text-center">
+                                                {(user.TrangThai === 1 || user.TrangThai === true) ? (
+                                                    <div className="flex items-center justify-center gap-2 text-emerald-500 font-black text-[10px] uppercase italic">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                                        Hoạt động
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center justify-center gap-2 text-rose-500 font-black text-[10px] uppercase italic">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
+                                                        Đã khóa
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="p-6 text-center">
+                                                <div className="flex justify-center gap-2">
+                                                    <button onClick={() => openEditModal(user)} className="p-2.5 bg-indigo-600/10 text-indigo-400 rounded-2xl border border-indigo-500/20 hover:bg-indigo-600 hover:text-white transition-all shadow-lg active:scale-90" title="Sửa"><HiCursorClick size={18} /></button>
+                                                    <button onClick={() => handleToggleLock(user.MaNguoiDung, user.TrangThai)} className={`p-2.5 rounded-2xl transition-all shadow-lg active:scale-90 border ${(user.TrangThai === 1 || user.TrangThai === true) ? 'bg-amber-600/10 text-amber-500 border-amber-600/20 hover:bg-amber-600 hover:text-white' : 'bg-emerald-600/10 text-emerald-500 border-emerald-600/20 hover:bg-emerald-600 hover:text-white'}`}>{ (user.TrangThai === 1 || user.TrangThai === true) ? <HiLockClosed size={18} /> : <HiLockOpen size={18} /> }</button>
+                                                    <button onClick={() => handleDeleteUser(user.MaNguoiDung)} className="p-2.5 bg-rose-600/10 text-rose-500 rounded-2xl border border-rose-600/20 hover:bg-rose-600 hover:text-white transition-all shadow-lg active:scale-90" title="Xóa"><HiTrash size={18} /></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan="5" className="p-20 text-center text-slate-500 font-black tracking-[0.3em] italic">🚫 Không có dữ liệu khách hàng</td></tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
+                </div>
 
                     {/* Pagination (Phân Trang) */}
                     {totalPages > 1 && (
-                        <div className="flex justify-center items-center mt-6 gap-2">
+                        <div className="flex justify-center items-center mt-10 gap-3 pb-8">
                             <button
                                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                                 disabled={currentPage === 1}
-                                className="px-3 py-1 border rounded bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                className="bg-slate-800 text-slate-400 p-3 rounded-2xl hover:bg-indigo-600 hover:text-white disabled:opacity-30 disabled:hover:bg-slate-800 disabled:cursor-not-allowed transition-all border border-slate-700"
                             >
-                                &laquo; Trước
+                                ◀
                             </button>
-                            {[...Array(totalPages)].map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setCurrentPage(i + 1)}
-                                    className={`px-3 py-1 rounded transition border ${currentPage === i + 1 ? 'bg-[#003c71] text-white current-page-btn' : 'bg-white hover:bg-gray-100'}`}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
+                            <div className="flex gap-2">
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                        className={`w-12 h-12 rounded-2xl font-black transition-all ${currentPage === i + 1 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/20' : 'bg-[#1e293b] text-slate-400 hover:bg-slate-700 border border-slate-700'}`}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                            </div>
                             <button
                                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                                 disabled={currentPage === totalPages}
-                                className="px-3 py-1 border rounded bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                className="bg-slate-800 text-slate-400 p-3 rounded-2xl hover:bg-indigo-600 hover:text-white disabled:opacity-30 disabled:hover:bg-slate-800 disabled:cursor-not-allowed transition-all border border-slate-700"
                             >
-                                Sau &raquo;
+                                ▶
                             </button>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Modal Edit Khách Hàng */}
+            {/* --- MODAL EDIT (Dark Mode) --- */}
             {editingUser && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-                    <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md animate-fade-in-up">
-                        <div className="flex justify-between items-center mb-5 border-b pb-3">
-                            <h3 className="text-xl font-bold text-[#003c71]">Cập nhật thông tin</h3>
-                            <button onClick={() => setEditingUser(null)} className="text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
+                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+                    <div className="bg-[#1e293b] p-8 rounded-[2rem] shadow-2xl w-full max-w-lg border border-slate-700 border-t-indigo-500/30">
+                        <div className="flex justify-between items-center mb-8 pb-4 border-b border-slate-700/50">
+                            <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">
+                                🔧 Cập Nhật <span className="text-indigo-400">Tài Khoản</span>
+                            </h2>
+                            <button onClick={() => setEditingUser(null)} className="text-slate-500 hover:text-white transition-colors text-2xl">✕</button>
                         </div>
-                        <form onSubmit={handleSaveEdit}>
-                            <div className="space-y-4 mb-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Họ và Tên (*)</label>
-                                    <input
-                                        type="text" required
-                                        className="w-full border p-2 rounded focus:ring-2 focus:ring-[#003c71] outline-none capitalize"
-                                        value={editForm.HoTen} onChange={e => setEditForm({ ...editForm, HoTen: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Email (*)</label>
-                                    <input
-                                        type="email" required
-                                        className="w-full border p-2 rounded bg-gray-50 focus:ring-2 focus:ring-[#003c71] outline-none"
-                                        value={editForm.Email} onChange={e => setEditForm({ ...editForm, Email: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Số Điện Thoại (*)</label>
-                                    <input
-                                        type="tel" required
-                                        placeholder="Ví dụ: 0987654321"
-                                        className="w-full border p-2 rounded focus:ring-2 focus:ring-[#003c71] outline-none"
-                                        value={editForm.SoDienThoai} onChange={e => setEditForm({ ...editForm, SoDienThoai: e.target.value })}
-                                    />
-                                </div>
+
+                        <form onSubmit={handleUpdate} className="space-y-6">
+                            <div className="space-y-1">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Họ và Tên</label>
+                                <input
+                                    required
+                                    className="w-full bg-slate-900 border-slate-700 border p-3.5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold"
+                                    value={editForm.HoTen}
+                                    onChange={e => setEditForm({...editForm, HoTen: e.target.value})}
+                                />
                             </div>
-                            <div className="flex justify-end gap-3 pt-2">
-                                <button type="button" onClick={() => setEditingUser(null)} className="px-5 py-2 border rounded font-semibold text-gray-600 hover:bg-gray-100 transition">Hủy bỏ</button>
-                                <button type="submit" className="px-5 py-2 rounded bg-green-600 text-white font-bold hover:bg-green-700 shadow transition">Lưu Thay Đổi</button>
+                            <div className="space-y-1">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Email</label>
+                                <input
+                                    required
+                                    type="email"
+                                    className="w-full bg-slate-900 border-slate-700 border p-3.5 rounded-2xl text-slate-400 font-bold opacity-70 cursor-not-allowed"
+                                    value={editForm.Email}
+                                    readOnly
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Số điện thoại</label>
+                                <input
+                                    className="w-full bg-slate-900 border-slate-700 border p-3.5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold"
+                                    value={editForm.SoDienThoai}
+                                    onChange={e => setEditForm({...editForm, SoDienThoai: e.target.value})}
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Phân quyền</label>
+                                <select
+                                    className="w-full bg-slate-900 border-slate-700 border p-3.5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold"
+                                    value={editForm.MaQuyen}
+                                    onChange={e => setEditForm({...editForm, MaQuyen: parseInt(e.target.value)})}
+                                >
+                                    <option value={1} className="bg-slate-900">Quản trị viên (Admin)</option>
+                                    <option value={2} className="bg-slate-900">Khách hàng (User)</option>
+                                </select>
+                            </div>
+
+                            <div className="flex justify-end gap-4 mt-10 pt-6 border-t border-slate-700/50">
+                                <button type="button" onClick={() => setEditingUser(null)} className="px-6 py-2 text-slate-400 font-bold hover:text-white transition-colors uppercase text-xs tracking-widest">Hủy</button>
+                                <button type="submit" className="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-900/20 active:scale-95">
+                                    Lưu Thay Đổi
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

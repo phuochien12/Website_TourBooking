@@ -430,15 +430,15 @@ function App() {
                     </aside>
 
                     {/* Nội dung Admin */}
-                    <main className="flex-1 bg-gray-100 overflow-auto">
+                    <main className="flex-1 bg-[#0f172a] overflow-auto">
                         {/* Nút mở sidebar khi đã đóng */}
                         {!sidebarOpen && (
-                            <div className="flex items-center gap-4 bg-white p-4 shadow-sm border-b border-gray-200">
-                                <button onClick={() => setSidebarOpen(true)} className="px-4 py-2 bg-[#1e293b] text-white rounded-xl hover:bg-[#334155] transition-all duration-200 text-xs font-bold shadow-lg shadow-navy/20 flex items-center gap-2">
+                            <div className="flex items-center gap-4 bg-[#1e293b] p-4 shadow-sm border-b border-white/5">
+                                <button onClick={() => setSidebarOpen(true)} className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all duration-200 text-xs font-bold shadow-lg shadow-blue-900/20 flex items-center gap-2">
                                     <span>☰</span> MENU QUẢN LÝ
                                 </button>
-                                <div className="h-4 w-[1px] bg-gray-300"></div>
-                                <span className="text-xs font-black text-navy/40 uppercase tracking-widest">Hệ thống quản trị du lịch việt</span>
+                                <div className="h-4 w-[1px] bg-white/10"></div>
+                                <span className="text-xs font-black text-white/40 uppercase tracking-widest italic">Hệ thống quản trị du lịch việt</span>
                             </div>
                         )}
                         <Routes>
