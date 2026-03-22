@@ -97,7 +97,7 @@ function DanhSachTour() {
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {tours.map(tour => {
-                                    const hasDiscount = tour.PhanTramGiamGia && tour.PhanTramGiamGia > 0;
+                                    const hasDiscount = !!(tour.PhanTramGiamGia && tour.PhanTramGiamGia > 0);
                                     const salePrice = hasDiscount ? tour.GiaGoc * (1 - tour.PhanTramGiamGia / 100) : tour.GiaGoc;
 
                                     return (

@@ -298,11 +298,11 @@ function QuanLyTour() {
                                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1 pl-1">Thời Gian (VD: 3N2Đ)</label>
                                         <select required className="w-full bg-slate-900 border-slate-700 border p-3 rounded-2xl text-white outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-bold" value={formData.ThoiGian} onChange={e => setFormData({ ...formData, ThoiGian: e.target.value })}>
                                             <option value="" className="bg-slate-900">-- Chọn Thời Gian --</option>
-                                            <option value="Trong Ngày" className="bg-slate-900">Trong Ngày</option>
-                                            <option value="2 Day 1 Night" className="bg-slate-900">2 Ngày 1 Đêm</option>
-                                            <option value="3 Day 2 Night" className="bg-slate-900">3 Ngày 2 Đêm</option>
-                                            <option value="4 Day 3 Night" className="bg-slate-900">4 Ngày 3 Đêm</option>
-                                            <option value="5 Day 4 Night" className="bg-slate-900">5 Ngày 4 Đêm</option>
+                                            <option value="1 Ngày" className="bg-slate-900">1 Ngày</option>
+                                            <option value="2 Ngày 1 Đêm" className="bg-slate-900">2 Ngày 1 Đêm</option>
+                                            <option value="3 Ngày 2 Đêm" className="bg-slate-900">3 Ngày 2 Đêm</option>
+                                            <option value="4 Ngày 3 Đêm" className="bg-slate-900">4 Ngày 3 Đêm</option>
+                                            <option value="5 Ngày 4 Đêm" className="bg-slate-900">5 Ngày 4 Đêm</option>
                                         </select>
                                     </div>
                                 </div>

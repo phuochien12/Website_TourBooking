@@ -91,7 +91,7 @@ function TrangChu() {
 
     // Component hiển thị thẻ tour
     const TourCard = ({ tour, badgeText, badgeColor }) => {
-        const hasDiscount = tour.PhanTramGiamGia && tour.PhanTramGiamGia > 0;
+        const hasDiscount = !!(tour.PhanTramGiamGia && tour.PhanTramGiamGia > 0);
         const salePrice = hasDiscount ? tour.GiaGoc * (1 - tour.PhanTramGiamGia / 100) : tour.GiaGoc;
 
         return (

@@ -129,7 +129,13 @@ app.get('/api/tours', async (req, res) => {
             queryStr += " AND (TenTour LIKE N'%' + @diemDen + '%' OR MaLoai IN (SELECT MaLoai FROM LoaiTour WHERE TenLoai LIKE N'%' + @diemDen + '%') OR MaDiemDen IN (SELECT MaDiaDiem FROM DiaDiem WHERE TenDiaDiem LIKE N'%' + @diemDen + '%'))";
         }
         // Chỉ ghép LIKE @thoiGian + '%' để lấy chính xác số ngày ở đầu tiên (vd: '2 Ngày', '2 Ngày 1 Đêm') chứ không lấy sai lệch ('12 Ngày')
-        if (thoiGian) queryStr += " AND ThoiGian LIKE @thoiGian + '%'";
+        if (thoiGian) {
+            if (thoiGian === '1 Ngày') {
+                queryStr += " AND (ThoiGian LIKE @thoiGian + '%' OR ThoiGian LIKE N'Trong Ngày%')";
+            } else {
+                queryStr += " AND ThoiGian LIKE @thoiGian + '%'";
+            }
+        }
         if (mucGia) {
             if (mucGia === 'duoi5') queryStr += " AND GiaGoc < 5000000";
             else if (mucGia === '5-10') queryStr += " AND GiaGoc BETWEEN 5000000 AND 10000000";
