@@ -1323,7 +1323,15 @@ app.post('/api/admin/schedules', async (req, res) => {
 
         res.json({ success: true, message: 'Thêm lịch khởi hành thành công!' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("❌ Lỗi Thêm Lịch:", err.message);
+        // Bắt lỗi ràng buộc ngày về >= ngày đi (CHK_Ngay)
+        if (err.message.includes('CHK_Ngay')) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Ngày kết thúc không thể trước ngày khởi hành. Vui lòng kiểm tra lại!' 
+            });
+        }
+        res.status(500).json({ error: 'Lỗi server: ' + err.message });
     }
 });
 

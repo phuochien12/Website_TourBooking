@@ -95,6 +95,17 @@ function QuanLyTour() {
 
     const handleAddSchedule = (e) => {
         e.preventDefault();
+
+        // [KIỂM TRA] Ngày về phải sau ngày khởi hành
+        if (new Date(newSchedule.NgayVe) < new Date(newSchedule.NgayKhoiHanh)) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Ngày không hợp lệ!',
+                text: 'Ngày kết thúc không thể trước ngày khởi hành. Vui lòng kiểm tra lại!',
+                confirmButtonColor: '#f97316'
+            });
+        }
+
         axios.post('/api/admin/schedules', { ...newSchedule, MaTour: selectedTourForSchedule.MaTour })
             .then(() => {
                 // [ĐỒNG BỘ] Thông báo thêm lịch thành công
@@ -102,8 +113,24 @@ function QuanLyTour() {
                 // Reload lại list lịch
                 axios.get(`/api/admin/schedules/${selectedTourForSchedule.MaTour}`)
                     .then(res => setSchedules(res.data));
+                
+                // Reset form
+                setNewSchedule({
+                    ...newSchedule,
+                    NgayKhoiHanh: '',
+                    NgayVe: '',
+                    MaHDV: ''
+                });
             })
-            .catch(err => Swal.fire({ icon: 'error', title: 'Lỗi!', text: err.message, confirmButtonColor: '#dc2626' }));
+            .catch(err => {
+                const errorMsg = err.response?.data?.error || err.message;
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Lỗi hệ thống!', 
+                    text: errorMsg, 
+                    confirmButtonColor: '#dc2626' 
+                });
+            });
     };
 
     // [MỚI] Hủy lịch khởi hành do sự cố (Admin)
